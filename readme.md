@@ -1,1 +1,3 @@
-#d:cd,,d,
+# TP NGS CHAUVE-SOURIS2
+
+readme du projet ngs 
