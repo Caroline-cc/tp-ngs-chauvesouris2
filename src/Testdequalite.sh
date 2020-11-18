@@ -2,17 +2,28 @@
 
 # Indication du dossier par défaut
 
-databats= "/home/rstudio/data/mydatalocal/databats"
-mkdir -p $databats
-cd $databats
+data="/home/rstudio/data/mydatalocal/data"
+mkdir -p $data
+cd $data
 
-#Dossier spécifique fastqc
-outputfastqc= "fastqc-data"
+#Dossier spécifique d'outputs de fastqc
+
+outputfastqc="fastqc-data"
 mkdir -p $outputfastqc
 cd $outputfastqc
-# Test de qualité-boucle for et fast qc
 
-for i in  /ifb/data/mydatalocal/sharegate-igfl.ens-lyon.fr/Projet_31_20_UE_NGS_2020/FASTQ/*.gz
-do echo $i
-fastqc $i --outdir /ifb/data/mydatalocal/outputfastqc/
+# Récupération des données de RNA-seq téléchargées
+
+home_fastq="home/rstudio/data/mydatalocal/download/sharegate-igfl.ens-lyon.fr"
+fastq=$home_fastq/"*.gz"
+## le * indique qu'on le fait sur tous les fichiers dans repertory home_fastq
+
+# Test de qualité fast qc
+## Utilisation d'une boucle for
+
+for sample in  $fastq
+do
+echo $sample
+fastqc $sample --outdir $data/$output_fastqc
 done
+## on aurait pou dire v ou i à la place de sample
