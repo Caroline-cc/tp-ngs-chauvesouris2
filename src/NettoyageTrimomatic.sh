@@ -2,17 +2,19 @@
 
 
 # Créer un chemin
-data="/ifb/data/mydatalocal"
+data="/ifb/data/mydatalocal/data"
+cd $data
 
-#dossier dataclean
-dataclean="/ifb/data/mydatalocal/dataclean"
-#ou dataclean=$data"/dataclean"
-mkdir -p $dataclean
-cd $dataclean
+#Dossier spécifique pour les outputs de Trimmomatic
 
-# on Crée la variable read
-## Ne pas mettre d'espace nomdevarible="/ /"   ni avant ni après .
-reads="/home/rstudio/data/mydatalocal/sharegate-igfl.ens-lyon.fr/Projet_31_20_UE_NGS_2020/FASTQ/"
+output_trimmomatic="/ifb/data/mydatalocal/outputs/output_trimmomatic"
+#ou output_trimmomatic=$data"/output_trimmomatic"
+mkdir -p $output_trimmomatic
+cd $output_trimmomatic
+
+# Création de la variable read
+
+reads="/home/rstudio/data/mydatalocal/download/sharegate-igfl.ens-lyon.fr/Projet_31_20_UE_NGS_2020/FASTQ/"
 ## cd $readspas nécessaire
 
 libs=`ls $reads| cut -f1,2,3,4 -d "_" | sed 's/ /_/g'|uniq`
@@ -25,10 +27,8 @@ java -jar /softwares/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 8 -phred3
   $dataclean/${lib}_R1_paired.fastq.gz $dataclean/${lib}_R1_unpaired.fastq.gz $dataclean/${lib}_R2_paired.fastq.gz $dataclean/${lib}_R2_unpaired.fastq.gz\
   ILLUMINACLIP:$data/adapt.fasta:2:30:10 HEADCROP:9 MINLEN:100
 
-#tout sur une ligne de script
 done
 
+## cut -..... on garde les 4 premiers caractères du nom du fichier, délimités par "_"
+##tout mettre sur une ligne de script ou utliser l'antislash avec éventuellement tabulation
 
-
-#Pour exécuter faire ./nomfichier.sh
-#Si "permission denied" faire chmod u+x NettoyageTrimomatic.sh
