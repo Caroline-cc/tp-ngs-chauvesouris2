@@ -111,13 +111,32 @@ Chauve-souris groupe 2: travail sur la quantification de l'expression génique (
 Chauve-souris groupe 1: Travail sur la phylogénie des duplications de PKR
 Alignement multi-séquences avec PRANK
 
+Analyse des sorties de Trinity:
+
+Sorties de trinity dans un fichier Trinity.fasta (transfert par Marie, données non obtenues par running du programme)
+Chaque transcript assemblé est signalé par une ligne commençant par un chevron.
+Un transcript est noté sous un format :  >TRINITY_DN1000_c115_g5_i1 indiquant le cluster du read (DN []_C[]), le gène (g[]) et l'isoforme 
+
+Sortie du nombre de transcripts assemblés par Trinity: envrion 400 mille transcripts. 
+Comptage du nombre de gènes (exclusion des isofromes) : 300 000 gènes, nombre excessif sans doute dû à des reads trop courts assemblés. 
+
+## Présentation Lucie Etienne (Mecredi 18): faire le topo  question biologique etc...
+
+
 ## Remappin des reads sur le transcriptome assemblé: Salmon (Mercredi 18)
 
-Comprendre le nom des outputs de Trinity:
+Quantification consiste basiquement à déterminer combien de reads s'alignent sur un transcript. 
+Génération d'un index pour faciliter (plus rapide) l'alignement des reads sur le transcript via salmon index.
+
+Quantification via salmon quant. 
+Indication d'un squençage en paired end 
+ésultats du running de  salmon quant jugés bons pour plus de 80% des reads alignés
 
 
 
 
 
-
-
+## A la 2 eme semaine: 
+-Revoir les scripts, faire tourner (sauf Trinity --> faire un kill)
+-Revoir le protocole de création de Library
+-Revoir Salmon : principe + script opérationnel? (non testé)
