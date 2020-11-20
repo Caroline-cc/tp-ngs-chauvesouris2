@@ -8,7 +8,7 @@ cd $data
 #Dossier spécifique pour les outputs de Trimmomatic
 
 output_trimmomatic="/ifb/data/mydatalocal/outputs/output_trimmomatic"
-#ou output_trimmomatic=$data"/output_trimmomatic"
+#ou output_trimmomatic=$data"/outputs/output_trimmomatic"
 mkdir -p $output_trimmomatic
 cd $output_trimmomatic
 
