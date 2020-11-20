@@ -8,6 +8,5 @@ grep > Trinity_RF.fasta |less
 
 ### Nécessité d'exclure la distinction des isoformes
 
-### |cut -f1,2,3,4 -d"_" |less
-### |sort|unique|wc -l
-
+### Trinity.fasta |cut -f1,2,3,4 -d"_" |less|sort|unique|wc -l
+### (word count -lines)
