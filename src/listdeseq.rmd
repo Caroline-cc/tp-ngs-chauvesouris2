@@ -1,0 +1,79 @@
+---
+title: "Analyse_DE.rmd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{tximport}
+
+library(tximport)
+
+
+varion <-c(1,2,3,4,5,6)
+fichier <- c()
+for (i in varion) {
+  fichier[i] <-paste0("/ifb/data/mydatalocal/salmon_alignment_paired_end/quant_",i,"/quant.sf")
+  }
+
+#associer un nom aux fichiers
+names(fichier)<-c("Lib1_31_20_S1","Lib2_31_20_S2","Lib3_31_20_S3","Lib4_31_20_S4","Lib5_31_20_S5","Lib6_31_20_S6")
+file_wo3 <- fichier[-3] #Remove Lib3
+
+trini <- read.table("/ifb/data/mydatalocal/transfer_trinity/Trinity.fasta.gene_trans_map")
+names(trini) <-c("GENEID","TXNAME")
+trini1 <-trini[,c(2,1)]  
+
+txi <- tximport(fichier,type="salmon",tx2gene=trini1)
+txi_wo3<- tximport(file_wo3,type="salmon",tx2gene=trini1)
+```
+```{r pressure, echo=FALSE}
+samp.name <- c("Lib1_31_20_S1","Lib2_31_20_S2","Lib3_31_20_S3","Lib4_31_20_S4","Lib5_31_20_S5","Lib6_31_20_S6")
+#samp.type <- c("CTL","CTL","CTL","INF","INF","INF")
+samp.type <- factor(rep(c("CTL", "IFN"), each = 3))
+samples <- data.frame(run=samp.name,condition=samp.type)
+
+ddsTxi <- DESeqDataSetFromTximport(txi,
+                                   colData = samples,
+                                   design = ~ condition)
+
+
+ddsTxi
+
+```
+
+
+
+
+```{r pressure, echo=FALSE}
+dds <- DESeq(ddsTxi)
+res <- results(dds)
+
+```
+
+
+```{r pressure, echo=FALSE}
+table(res$padj < 0.1)
+```
+
+```{r pressure, echo=FALSE}
+plotMA(res, ylim=c(-2,2))
+```
+
+
+```{r pressure, echo=FALSE}
+plotMA(res, ylim=c(-2,2))
+ vsd <- vst(dds, blind=FALSE)
+ plotPCA(vsd, intgroup=c("condition","run"))
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

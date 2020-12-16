@@ -140,3 +140,19 @@ Indication d'un squençage en paired end
 -Revoir les scripts, faire tourner (sauf Trinity --> faire un kill)
 -Revoir le protocole de création de Library
 -Revoir Salmon : principe + script opérationnel? (non testé)
+
+
+## Annoter les gènes transcripts : 2 approches
+Objectif:   avoir une vision fonctionnelle des transcripts dans le cadre de l'étude la réponse antivirale chez les chauve souris en cherchant des homologies de séquence.
+
+Blast: programme pour trouver des alignements locaux. Adapté pour la recherche d'alignements de séquences PKR avec la basse de données obtenue. Pour létude fonctionnelle des transcripts, comparaison avec des CDS humains, car CDS humains mieux annotés en identifiant des homologues de gènes bien caractérisés.
+
+Transdecoder: Permet d'identifier les contigs de Trinity contenant des séquences codantes.  C
+
+#Blast sur séquences CDS humaines
+
+On charge les inputs, les CDS humains sur des bases de données 
+Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. 
+
+
+
