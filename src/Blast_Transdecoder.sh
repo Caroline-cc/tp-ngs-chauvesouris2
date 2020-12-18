@@ -3,12 +3,11 @@
 # Recherche d'alignements locaux: Blast
 
 ## Database reference building (création d'une data base pour blast à partir de nos fichiers de trinity?)
+
 output_sapiens_cds="home/rstudio/mydatalocal/outputs"
 mkdir $output_sapiens_cds
 
 wget -O $output_sapiens_cds/Homo_sapiens.GRCh38.cds.fa.gz ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cds/Homo_sapiens.GRCh38.cds.all.fa.gz
-
-gunzip $outputs/*
 
 
 
@@ -16,12 +15,16 @@ gunzip $outputs/*
 
 output_sapiens_cds="/home/rstudio/"
 mkdir $output_sapiens_cds
-wget -O ${output_sapiens_cds}"banque_blast/Homo_sapiens.GRCh38.cds.fa.gz" ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cds/Homo_sapiens.GRCh38.cds.all.fa.gz
+wget -O ${output_sapiens_cds}"banque_blast/Homo_sapiens.GRCh38.cds.fa.gz"\
+ftp://ftp.ensembl.org/pub/release-101/fasta/homo_sapiens/cds/Homo_sapiens.GRCh38.cds.all.fa.gz
 gunzip $outputs/*
 
+BLASTDB_hum=$BLASTDBDIR/"Homo_sapiens.GRCh38.db"
 
+#To build database
 db_hum= $BLASTDB_hum.nhr
 
+query=$TRANSDECODERTRANSCRIPTOMES/"Trinity.fast.transdecoder.cds"
 
 FASTAREFERENCE_hum =$banque_blast/Homo_sapiens.GRCh38.cds.fa.gz
 "/softwares/ncbi-blast-2.10.1+/bin/makeblastdb"-in $FASTAREFERENCE_hum -dbtype nucl -parse_sequids-out  $BLASTDB_hum
@@ -29,7 +32,7 @@ FASTAREFERENCE_hum =$banque_blast/Homo_sapiens.GRCh38.cds.fa.gz
 
 ##parse_sequid permet d'avoir une entrée fasta. Format de banque blast
 
-
+query=$TRANSDECODER
 
 FASTAREFERENCE_hum=$BLASTDBDIR.sapiens.GRCh38.cds.fa
 
