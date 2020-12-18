@@ -1,0 +1,91 @@
+---
+title: "croisementblast"
+output: html_document
+---
+
+```{Librairie Biomart}
+library(dplyr)
+library(tidyr)#restart R si pb (aller dans session)
+library(data.table)
+library(ggplot2) #graphs
+
+```
+```{r}
+library(dplyr)
+library(tidyr)
+library(data.table)
+library(ggplot2)
+library(biomaRt)
+```
+```{r}
+ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
+tx2geneHomo = biomaRt::getBM(attributes=c('ensembl_transcript_id', 
+                                      'ensembl_gene_id', 'external_gene_name'),mart=ensembl)
+```
+
+```{r}
+blastHomo<-read.table("/ifb/data/mydatalocal/download/DataBats.blast")
+blastHomo<-data.table(blastHomo)
+head (blastHomo)
+```
+
+```{r}
+blastHomo<-blastHomo[, c("trid", "version") := tstrsplit(V2, ".", fixed=TRUE)][]
+blastHomo<-blastHomo[, c("gene", "alttr") := tstrsplit(V1, "_i", fixed=TRUE)][]
+blastHomo1 <- blastHomo%>% group_by(gene)%>% slice_max(order_by = V12, n = 1, with_ties = TRUE)
+blastHomoName<-merge(tx2geneHomo,blastHomo1,by.x="ensembl_transcript_id",by.y="trid")
+blastHomoNameUniq<-unique(blastHomoName[,c("ensembl_gene_id","external_gene_name","gene")])
+resUsName=merge(res,blastHomoNameUniq,by.x=0,by.y="gene")
+resUsName
+View(resUsName)
+write.csv(resUsName,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
+#pour télécharger le tableau de résultats
+
+UpReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange>0)#pour séparer dans le tableau les 
+View(UpReg)
+write.csv(UpReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_up")
+UpReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange>0)
+DownReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange<0)
+write.csv(DownReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_down")
+AllReg <- filter(resUsName, padj<0.05)
+AllReg
+
+#article Holzer
+resBatHolzer<-read.csv("https://www.rna.uni-jena.de/supplements/mda/data/deseq2/RNA/Mock_6h_RNA_vs_IFN_6h_RNA/deseq2_Mock_6h_RNA_IFN_6h_RNA_full.csv")
+```
+
+```{r}
+write.csv(as.data.frame(resUsName$external_gene_name),file = "/ifb/data/mydatalocal")
+
+
+write.csv(as.data.frame(resUsName$external_gene_name), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_all.csv",quote=FALSE,row.names = FALSE)
+write.csv(as.data.frame(UpReg$external_gene_name), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_up.csv",quote=FALSE,row.names = FALSE)
+write.csv(as.data.frame(DownReg$external_gene_name), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_down.csv",quote=FALSE,row.names = FALSE)
+
+colnames(resBatHolzer)[colnames(resBatHolzer)==gene_id]=ensembl_gene_id
+resBatHolzer
+Holzer_resUs<-merge(resBatHolzer,resUsName,by.x="gene_id",by.y="trid")
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

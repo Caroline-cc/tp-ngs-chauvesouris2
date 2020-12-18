@@ -154,5 +154,30 @@ Transdecoder: Permet d'identifier les contigs de Trinity contenant des séquence
 On charge les inputs, les CDS humains sur des bases de données 
 Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. 
 
+(16/12 matin : mise au point de salmon quant et salmon index)
+# Expression différentielle
 
+Premier étape: importer les données de quantification (fichiers salmon, paired end ) pour l'analyse par DESeq
+Deuxième étpe: lecture du mapping de trinity et sélection des colonnes d'intérêt
+Construction d'une table associant données de quantitification et transcriptiomiqe 
+Création d'un data set pour y appliquer la fonction DESeq avec DESeq2 
+*class: DESeqDataSet 
+dim: 311364 6 
+metadata(1): version
+assays(2): counts avgTxLength
+rownames(311364): TRINITY_DN0_c0_g1 TRINITY_DN0_c0_g2 ... TRINITY_DN99998_c0_g1
+  TRINITY_DN99999_c0_g1
+rowData names(0):
+colnames(6): Lib1_31_20_S1 Lib2_31_20_S2 ... Lib5_31_20_S5 Lib6_31_20_S6
+colData names(2): run condition*
 
+Outputs de DESeq donnent le niveau d'expression en condition test normalisé par le niveau d'expression en condition contrôle,  log2foldchange qui correspond au rapport des moyennes d'expression dans les 2 conditions: IFN et CTRL 
+
+Anlayse pour les 311364 types de transcripts différents (~gènes) dans les 6 échantillons 
+
+#Caractérisation des gènes présentant une expression différentielle en condition interféron
+
+Association  des données d'alignement des transcripts de blast avec des noms correspondants de  gènes humains , par la commande merge
+Association des données d'expression différentielle de DESeq2 (res) aux noms d'homologues de gènes humains trouvés 
+Comparaison des gènes présentant une DE avec ceux de Holzer
+dede
