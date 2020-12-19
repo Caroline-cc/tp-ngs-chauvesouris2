@@ -1,4 +1,5 @@
 # TP NGS CHAUVE-SOURIS2
+Thématique: appearent well tolerance of bats to viruses woud be due to the interferon system 
 Objectif: Identifier les gènes stimulés par la réponse interféron (ISGs) chez l'espèce de chauve-souris Myotis velifer
 Problème: Pas de datas de transcriptomique pour l'espèce Myotis velifer disponibles dans les bases de données
 Moyen: Production et analyse de données transcriptomique pour caractériser  le profil d'expression des gènes en réponse interféron de Myotis velifer
@@ -131,8 +132,10 @@ Génération d'un index pour faciliter (plus rapide) l'alignement des reads sur 
 Quantification via salmon quant. 
 Indication d'un squençage en paired end 
 ésultats du running de  salmon quant jugés bons pour plus de 80% des reads alignés
+Sorties de salmons indiquent le transcript ID pas le gène ID
 
-
+To summarize the transcript-level into gene level: tximport
+Tximport outputs "abundance","counts", length""
 
 
 
@@ -152,12 +155,12 @@ Transdecoder: Permet d'identifier les contigs de Trinity contenant des séquence
 #Blast sur séquences CDS humaines
 
 On charge les inputs, les CDS humains sur des bases de données 
-Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. 
-
+Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. Blast outputs: presented in 12 colnames 
+colnames(res) = c('qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore')
 (16/12 matin : mise au point de salmon quant et salmon index)
 # Expression différentielle
 
-Premier étape: importer les données de quantification (fichiers salmon, paired end ) pour l'analyse par DESeq
+Premier étape: To import estimates of transcripts-level abundance, we use tximport pipeline  importer les données de quantification des transcripts (fichiers salmon, paired end ) pour l'analyse par DESeq
 Deuxième étpe: lecture du mapping de trinity et sélection des colonnes d'intérêt
 Construction d'une table associant données de quantitification et transcriptiomiqe 
 Création d'un data set pour y appliquer la fonction DESeq avec DESeq2 
@@ -174,10 +177,29 @@ colData names(2): run condition*
 Outputs de DESeq donnent le niveau d'expression en condition test normalisé par le niveau d'expression en condition contrôle,  log2foldchange qui correspond au rapport des moyennes d'expression dans les 2 conditions: IFN et CTRL 
 
 Anlayse pour les 311364 types de transcripts différents (~gènes) dans les 6 échantillons 
+Analysing all 6 samples (libraries) 1745 genes with a significantly different expression were found on 294034
+Analysing the 5 samples (libraries) 1896 genes on 287 553 analyzed were fund with a significantly different expression comparing control and interferon treatment 
+
 
 #Caractérisation des gènes présentant une expression différentielle en condition interféron
 
 Association  des données d'alignement des transcripts de blast avec des noms correspondants de  gènes humains , par la commande merge
 Association des données d'expression différentielle de DESeq2 (res) aux noms d'homologues de gènes humains trouvés 
-Comparaison des gènes présentant une DE avec ceux de Holzer
-dede
+Comparaison des gènes présentant une DE avec ceux de Holzer: study to annotate non coding RNA from bats (many non coding genes from bats are not annotated) . Lead in 16 bats genomes . Annotations compatible with NCBI and Ensembl (what does it mean ???)(CF yes annotations are availbale for bats!)Studied genes induced by IFN directly or IFN-inducing viruses, exclusively in Myotis or in both Myotis and Humans . Study led on M. daubentonii, 
+/!\ The used a kidney -cel line 
+Results Holzer : "When cells were treated for 6 h with IFN, 195 genes were strongly upregulated (i.e., substantially more than after
+6 h of Clone 13 infection). No gene was downregulated (Figures 3A and 3B). The IFN-regulated genes encompassed prototypical (OAS1, ISG15, Mx1, IFIT3, BST2, DHX58) but also less known ISGs (BCL2L14, RNF213, ESIP1)."
+
+"predominant biological processes both at 6 and 24 h post infection
+encompassed antigen processing and presentation, antiviral defense, immune response, and NF-kB regulation (Figure S4B). Additionally, at 6 h there are indications of both up- and downregulation of intracellular
+and transmembrane transport, and at 24 h oxidoreductase activity is mostly downregulated.
+"Overall, running the two transcriptomes next to each
+other showed once more that at 6 h Clone 13 infection stimulated less genes (denominated as being ‘‘downregulated’’) than 6-h IFN treatment (Figures 4A and 4B). We could identify some genes that are upregulated
+exclusively by Clone 13, most prominently the prototypical, IRF3-driven virus-response gene IFNB1."
+
+
+
+
+## Ideas:
+
+-Why not comparing woth other bats : annotations available
