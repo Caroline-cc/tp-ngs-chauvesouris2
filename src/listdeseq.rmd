@@ -3,10 +3,6 @@ title: "Analyse_DE.rmd"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 ## R Markdown
 
@@ -18,62 +14,221 @@ When you click the **Knit** button a document will be generated that includes bo
 
 library(tximport)
 
-
+#Locate the directory containing the quantification files, associate files'values to a variable 
 varion <-c(1,2,3,4,5,6)
 fichier <- c()
 for (i in varion) {
   fichier[i] <-paste0("/ifb/data/mydatalocal/salmon_alignment_paired_end/quant_",i,"/quant.sf")
   }
 
-#associer un nom aux fichiers
+#Associate filenames (sample IDs) to the quantification data
 names(fichier)<-c("Lib1_31_20_S1","Lib2_31_20_S2","Lib3_31_20_S3","Lib4_31_20_S4","Lib5_31_20_S5","Lib6_31_20_S6")
 file_wo3 <- fichier[-3] #Remove Lib3
 
+#Lire l'association quantification des  transcripts avec salmon  aux gènes   Trinity et sélection des colonnes 
+#Create a vector containing transcript names readden in a table with the transcript ID from Trinity
+#Create a dataframe with two columns: transcript IDs and gene IDs. 
 trini <- read.table("/ifb/data/mydatalocal/transfer_trinity/Trinity.fasta.gene_trans_map")
 names(trini) <-c("GENEID","TXNAME")
-trini1 <-trini[,c(2,1)]  
+trini1 <-trini[,c(2,1)]  #Arrange The coluln order transcript-gene IDs
+#Importation des données de quantification pour DESeq2 en utilisant Tximport
+##indicate type (quantification software)
 
 txi <- tximport(fichier,type="salmon",tx2gene=trini1)
+head(txi$counts)
+head(txi$abundance)
+
+
 txi_wo3<- tximport(file_wo3,type="salmon",tx2gene=trini1)
 ```
-```{r pressure, echo=FALSE}
+```{Data set for DESeq2}
+
+## Associate sample names/run (rownames) with conditions (colnames)
 samp.name <- c("Lib1_31_20_S1","Lib2_31_20_S2","Lib3_31_20_S3","Lib4_31_20_S4","Lib5_31_20_S5","Lib6_31_20_S6")
-#samp.type <- c("CTL","CTL","CTL","INF","INF","INF")
 samp.type <- factor(rep(c("CTL", "IFN"), each = 3))
 samples <- data.frame(run=samp.name,condition=samp.type)
+samples_wo3 <- data.frame(run=samp.name[-3],condition=samp.type[-3])
 
+library(DESeq2)
 ddsTxi <- DESeqDataSetFromTximport(txi,
                                    colData = samples,
                                    design = ~ condition)
 
+##Combine quantification data and the data frame 
 
-ddsTxi
-
+ddsTxi_wo3 <- DESeqDataSetFromTximport(txi_wo3,
+                                   colData = samples_wo3,
+                                   design = ~ condition)
+ddsTxi_wo3
 ```
 
+
+
+```{Measure DE}
+dds <- DESeq(ddsTxi)
+dds_wo3 <- DESeq(ddsTxi_wo3)
+res <- results(dds)
+res_wo3 <- results (dds_wo3)
+res_wo3
+write.table(res_wo3, "/ifb/data/mydatalocal/download/DE_align/dds_res_wo3", append = FALSE, sep = " ", dec = ".",
+             row.names = TRUE, col.names = TRUE)
+write.table(res, "/ifb/data/mydatalocal/download/DE_align/dds_res", append = FALSE, sep = " ", dec = ".",
+            row.names = TRUE, col.names = TRUE)
 
 
 
 ```{r pressure, echo=FALSE}
-dds <- DESeq(ddsTxi)
-res <- results(dds)
-
+resultats_DESeq2_full_dataset <- write.table(res)
+resultats_DESeq2_full_dataset <- write.table(res_wo3)
+##a revoir
 ```
-
 
 ```{r pressure, echo=FALSE}
 table(res$padj < 0.1)
+table(res_wo3$padj < 0.1)
 ```
 
-```{r pressure, echo=FALSE}
+```{Graphic lecture}
 plotMA(res, ylim=c(-2,2))
+plotMA(res_wo3, ylim=c(-2,2))
+vsd <- vst(dds, blind=FALSE)
+vsd_wo3 <- vst(dds_wo3, blind=FALSE)
+plotPCA(vsd, intgroup=c("condition","run"))
+plotPCA(vsd_wo3, intgroup=c("condition","run"))
+```
+
+ 
+```
+
+```{Instal Library BiomaRt}
+
+ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
+tx2geneHomo = biomaRt::getBM(attributes=c('ensembl_transcript_id', 
+                                      'ensembl_gene_id', 'external_gene_name'),mart=ensembl)
+library(biomaRt)
+```
+
+```{Assess other packages installation}
+library(dplyr)
+library(tidyr)#restart R si pb (aller dans session)
+library(data.table)
+library(ggplot2) #graphs
+
 ```
 
 
-```{r pressure, echo=FALSE}
-plotMA(res, ylim=c(-2,2))
- vsd <- vst(dds, blind=FALSE)
- plotPCA(vsd, intgroup=c("condition","run"))
+```{Import blast alignment datas }
+blastHomo<-read.table("/ifb/data/mydatalocal/download/DataBats.blast")
+blastHomo<-data.table(blastHomo)
+head (blastHomo)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{add gene names to blast outputs}
+blastHomo<-blastHomo[, c("trid", "version") := tstrsplit(V2, ".", fixed=TRUE)][]
+blastHomo<-blastHomo[, c("gene", "alttr") := tstrsplit(V1, "_i", fixed=TRUE)][]
+head (blastHomo)
+blastHomo1 <- blastHomo%>% group_by(gene)%>% slice_max(order_by = V12, n = 1, with_ties = TRUE)
+head (blastHomo1)
+blastHomoName<-merge(tx2geneHomo,blastHomo1,by.x="ensembl_transcript_id",by.y="trid")
+blastHomoNameUniq<-unique(blastHomoName[,c("ensembl_gene_id","external_gene_name","gene")])
+```
+
+
+```{association of DE results (Cf DESeq2) and gene's human names}
+resUsName=merge(res,blastHomoNameUniq,by.x=0,by.y="gene")
+resUsName
+resUsNamewo3=merge(res_wo3,blastHomoNameUniq,by.x=0,by.y="gene")
+resUsName_wo3
+## problème : revoir à partir de là et pour la suite, revoir blast sans doute solution
+View(resUsName)
+write.csv(resUsName,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
+write.csv(resUsName_wo3,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
+#pour télécharger le tableau de résultats
+
+```
+
+
+```{Classification de resUsName:our table}
+UpReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange>0)#pour séparer dans le tableau les 
+View(UpReg)
+write.csv(UpReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_up")
+
+ 
+DownReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange<0)
+write.csv(DownReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_down")
+
+AllReg <- filter(resUsName, padj<0.05)
+AllReg
+write.csv(AllReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_allreg")
+```
+
+```{Comparaison data Holzer}
+#article Holzer
+resBatHolzer<-read.csv("https://www.rna.uni-jena.de/supplements/mda/data/deseq2/RNA/Mock_6h_RNA_vs_IFN_6h_RNA/deseq2_Mock_6h_RNA_IFN_6h_RNA_full.csv")
+```
+
+```{r}
+write.csv(as.data.frame(unique(resUsName$external_gene_name)), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_all.csv",quote=FALSE,row.names = FALSE)
+
+write.csv(as.data.frame(unique(AllReg$external_gene_name)), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_allreg.csv",quote=FALSE,row.names = FALSE)
+
+
+write.csv(as.data.frame(unique(UpReg$external_gene_name)), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_up.csv",quote=FALSE,row.names = FALSE)
+ 
+          
+
+write.csv(as.data.frame(unique(DownReg$external_gene_name)), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_down.csv",quote=FALSE,row.names = FALSE)
+
+##colnames(resBatHolzer)[colnames(resBatHolzer)==gene_id]=ensembl_gene_id: not the right column to change
+
+colnames(resBatHolzer)[2] <- c("external_gene_name")#change the column name to compare
+head(resBatHolzer)
+
+##Merge des gènes communs dans Holzer et Us
+Holzer_resUs<-merge(resBatHolzer,resUsName,by.x="external_gene_name",by.y="external_gene_name")
+
+##Construction d'une table avec les up reg dans Holzer et Us
+
+table(them=Holzer_resUs$padj.x<0.05,us=Holzer_resUs$padj.y < 0.05)
+#attention à l'ordre dans le merge pour déterminer le x et le y 
+
+chisq.test(table(them=Holzer_resUs$padj.x<0.05,us=Holzer_resUs$padj.y < 0.05))
+#chisq.test(table(us=CommonGenesUsHolze$ourTest,them=CommonGenesUsHolze$theirTest)
+#X-squared = 707.46, df = 1, p-value < 2.2e-16
+
+write.csv(table(them=Holzer_resUs$padj.x<0.05,us=Holzer_resUs$padj.y < 0.05)="/ifb/data/mydatalocal/outputs/holzer_us")
+table(resBatHolzer$padj <0.05)#gène de Holter avec DE, 1702 DE VS 12141 NS
+table(resBatHolzer$padj <0.05 & resBatHolzer$log2FoldChange>0)#sélectiongènesupreg
+```
+
+
+```{r}
+table(resBatHolzer$padj <0.05 & resBatHolzer$log2FoldChange<0) #Number of genes significatively DOWNregulated 605 VS 16536
+
+```
+
+```{heatmap}
+select <- na.omit(resUsName$Row.names[resUsName$padj<0.05 & resUsName$log2FoldChange>0]) #sélection des gènes surexprimés
+select <-select[1:10]
+row.names(samples)=samples$run
+
+pheatmap(assay(vsd)[select,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames=FALSE,
+         cluster_cols=FALSE, annotation_col=samples)
+         
+```
+
+```{r}
+resUsNameVsd <- merge(resUsName,assay(vsd),by.x="Row.names",by.y=0)
+row.names(resUsNameVsd) <- resUsNameVsd$Row.names
+cibles <- c("ACTG1","ADAMTSL4")
+pheatmap(resUsNameVsd[resUsNameVsd$external_gene_name%in%cibles,10:15], cluster_rows=TRUE, show_rownames=TRUE,show_colnames=FALSE,
+         cluster_cols=FALSE, annotation_col=samples)
+```
+
+
+
