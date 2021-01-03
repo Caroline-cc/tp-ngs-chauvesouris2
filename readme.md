@@ -1,23 +1,25 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # TP NGS CHAUVE-SOURIS2
-Thématique: appearent well tolerance of bats to viruses woud be due to the interferon system 
-Objectif: Identifier les gènes stimulés par la réponse interféron (ISGs) chez l'espèce de chauve-souris Myotis velifer
+
+##Introduction
+Bats are frequently exposed to  a large spectrum of viruses but seem asymptomaric. This suggest specific bat's immunity responses developed through a long -term cohabitation with viruses. Bat's immunity would have reached an equilibrium between viral resistance and tolerance. High tolerance to viruses is thought to be due to a particularly performant antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Insterferon Stimulated Genes (ISG). Some ISG protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
+Here we aimed at identifying genes stimulated by the interferon response in Myotis velifer specie of microbat. Analyses were performed on transcriptomic data collected by L.E's scientific team. Analyses first consisted in transcriptome assembly and annotation steps. Then trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with known human corresponding ISGs.  
+
 Problème: Pas de datas de transcriptomique pour l'espèce Myotis velifer disponibles dans les bases de données
 Moyen: Production et analyse de données transcriptomique pour caractériser  le profil d'expression des gènes en réponse interféron de Myotis velifer
 
-Etape
-1) Assemblage du transcriptome et annotations
-2) Quantification de l'expression des gènes suite à la stimulation IFN
 
-## Protocole biologique
-Données RNA-seq obtenues sur culture de fibroblastes de chauve souris Myotis Velifer 
-Culture de fibroblastes Cotrôles ou incubées 6h avec l'IFN
+## Obtention of biological datas
+Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
+![GitHub Logo](/images/paired-end-read-1.png) 
+
 ## Téléchargement des données de RNA-seq (Lundi 16)
 
-2 populations d'échantillons: Contrôle (CTRL) et Traités (IFN) 
-Données RNA-seq des 6 échantillons téléchargées sur le site de l'igfl 
-Cf:telechargement_rnadata_vp.sh OU /tp_ngs_chauvesouris/telechargement_rnadata_git.sh (depot git)
-Type de fichier: fasta ou fastq?
-fastq = Combinaison de données biologiques (fichier fasta (fa)) et de données concernant la qualité
+
 
 Reading: single-end ou paired-end?
 RNA-seq en single-end: lit le fragment d'ARN d'un bout à l'autre,
