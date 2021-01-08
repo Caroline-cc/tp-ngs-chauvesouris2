@@ -1,11 +1,14 @@
+
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
+
 # TP NGS CHAUVE-SOURIS2
 
 ##Introduction
+
 Bats are frequently exposed to  a large spectrum of viruses but seem asymptomaric. This suggest specific bat's immunity responses developed through a long -term cohabitation with viruses. Bat's immunity would have reached an equilibrium between viral resistance and tolerance. High tolerance to viruses is thought to be due to a particularly performant antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Insterferon Stimulated Genes (ISG). Some ISG protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
 Here we aimed at identifying genes stimulated by the interferon response in Myotis velifer specie of microbat. Analyses were performed on transcriptomic data collected by L.E's scientific team. Analyses first consisted in transcriptome assembly and annotation steps. Then trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with known human corresponding ISGs.  
 
@@ -15,73 +18,55 @@ Moyen: Production et analyse de données transcriptomique pour caractériser  le
 
 ## Obtention of biological datas
 Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
-![GitHub Logo](/images/paired-end-read-1.png) 
+![GitHub Logo](/images/paired-end-read-1.png){width=30%} 
+-from thesequencingcenter.com-
 
 ## Téléchargement des données de RNA-seq (Lundi 16)
-
-
-
 Reading: single-end ou paired-end?
 RNA-seq en single-end: lit le fragment d'ARN d'un bout à l'autre,
 RNA-seq en paired-end:"sorte d'aller -retour" 2 reads, un sur chacun des brins, orientés dans des sens opposés
-
 RNA seq en paired-end est plus cher et plus long mais meilleure capacité à identifier la position relative des fragments dans le génome: meilleure gestion des réarrangements de séquence (insertion, délétion,inversion)
 Historiquement, single end arrivé en premier puis paired end, aujourd'hui le séquençage RNA standard utilisé. 
 Ici, pour chaque échantillon, on a bien un Read 1 et un Read 2, chacun d'environ 150pb (assez court). Théoriquement les 2 reads ne sont pas censés se chevaucher mais c'est arrivé
 /!\ On n'a pas la séquence entre les reads
 
---> Ces datas de RNA-seq peuvent-elles êtres utilisées pour un assemblage du transcriptome de Myotis velifer?
+We first assessed the quality of reads' sequencing to determine if sequencing datas were reliable for transcriptome assembly. 
 
-## Test de qualité des données de RNA-seq avant assemblage : Fastqc (Mard 17)
+## Assessment of RNA-seq datas' quality: Fastqc (Mard 17)
 
-Programme fastqc Cf: Testdequalite.sh  in /mydatalocal/tp_ngs_chauvesouris/src
-Utilisation d'une boucle for pour appliquer la commande fast qc à tous les échantillons 
-Analyse de qualité stockée dans output_fastqc
-Lecture des fichiers html
-"Per base sequence quality"Diminution de la qualité du séquençage avec l'augmentation de la longueur du read. 
+To determine reads'quality we ran the fastqc program on each type of reads (forward and reverse) in all samples. 
+-Cf:Testdequalite file-
+Fastqc report present quality analysis at  different sequencing level.
+-Cf html files in outputs/output_fastqc-
+"Per base sequence quality" shows a drop in sequencing quality for final bases.Decreasing sequencing quality with increasing read length is due to tecnical defects. Indeed, in the Ilumina platform, among clusters of identical DNA molecule, sequencing of some DNA reads will desynchronize over runs. Consequently, probe signal for nucleotide identification will be less pure, increasing sequencing errors in last runs. 
+![GitHub Logo](/images/perbasequality_lib1.png){width=30%} 
+-Bases quality score in function of base position in the read, quality report for Lib1 library reads-
+
+The "Per sequence quality scores" indicated a good overall quality score in the great majority of reads in the different libraries. However the per sequence GC contents scores suggested unreliable read quality. In some libraries, the G proportion was sigificantly higher whereas we would expect similar proportions of A and T, and G and C, and consequently linear curves. This could be due to a biaised sequencing. 
+![GitHub Logo](/images/perbaseseqcontent.png){width=20%} 
+-Graphical representation of the per base sequence content from the fastqc report of R1 reads, library 1-
 "Per tile sequence quality" Distribution de la qualité moyenne pour chaque séquence
-"Per base sequence content" On s'attend à ce que ce soit linéaire, plat
 
 
+Considering the relative quality of RNA-seq datas, especially the dropping at sequences'end, we cleaned the datas. Indeed, a low row datas quality could biased following analysis.; 
 --> Qualité moyenne des donées de RNA-seq, nécessité d'un nettoyage pour ségréger les read appariés et non appariés 
 
-## Nettoyage des données de RNA seq : Trimommatic (Mar 17)
-L'objectif est d'éliminer des données à assembler les débuts et fins de séquences de mauvaise qualité. 
-2 possibilités intégrer l'étape de Nettoyage à l'Assemblage (intégrer Trimommatic à Trinity) ou séparément
-Choix de faire séquentiellement: Trimommatic puis Trinity pour faire un nouveau ontrôle (fastqc) après nettoyage.
-
-Entrée des commandes de nettoyage à Trimmomatic:
-- Indiquer que  les reads sont appariés: pour chaque sample, 2 inputs : R1 et R2
--Indiquer le nombre de coeurs disponibles pour exécuter la commande (thread)
--Le score de qualité d'une base nucléotidique: phred 33
-Cf un phred de 30 correspond à une P(identification nucléotidique incorrecte)= 1. 10 E-3
-- Paramètres du nettoyage
-
-ILLUMINACLIP: enlever les adaptateurs Illumina et autoriser des mismatchs entre séquence read et séquence adaptateur 
-HEADCROP: 9 
-MINLEN (enlever les séquences trop petites)
-TRAILING (couper les bases en dessous d'un seuil de qualité)
+## Cleaning of RNA-seq datas: Trimommatic (Mar 17)
+Before genome assembly we cleaned datas with Trimommatic.
+Note that cleaning step can also be treated with genome assembly combining program running. To treat paired reads, we ran Trimmomatic in a paired-end (PE) mode distinguishing froward and reverse read files as inputs.Nucleotides with a quality score or phred score threhold of 33 were filtered. In others words, bases with an incorrect probability call superior to 10^E -3 were eliminated. Short reads with a length below 100 bases were removed with MINLEN software, and the first 9 bases of each reads were suppressed (HEADCROP). Adaptators and illumina related sequences were also suppressed of reads (ILLUMINACLIP) Indeed adaptaters can be sequenced when if they dimerize or if they are readen as the prolongement of short DNA fragments by the sequencer. We could have removed starting or ending bases of reads, below a defined quality threshold with leading and trailing.  
+Paired and unpaired  reads resulting from Trimmomatic cleaning were  distinguished  in dedicated output files, for each forward and reverse reads 
+Reads quality was performed again with fastqc to assess trimming efficiency. 
 
 
-Certaines séquences sont supprimées et vont se retrouver non appariées
-Création de 4 fichiers de sortie pour chaque échantillon:
-Une version paired et unpaired pour chacun des reads (left ou R1 et right ou R2)
-
-## Nouveau tets de la qualité des données de RNA-seq après nettoyage: fastqc
+## Second quality test of RNA-seq datas (fastqc)
 
 (Personnellement non réalisé, retard,)
 
-## Assemblage des données transcriptomiques: Trinity (Mercre 18)
+## Genome assembly with Trinity (Mercre 18)
+Since no genome is available for Myotis Velifer, we performed de novo genome assembly using transcriptomic datas from both interferon and control conditions.In line with a paired-end analysis, for all six libraries only paired reads outputs of Timommatic were used. Trinity assembles the transcriptome using a Debreui Graph strategy. Transcripts with similar sequences are grouped in clusters that roughly correspond to a gene. Each clusters are treated separately to finally reconstruct the genome.  
 
-Trinity:
-Comprend 3softwares indépendants: inchworm, chrysalis, butterfly. Appliqués séquentiellement.
-Les transcripts sont regroupés en cluster, selon le contenu en séquence partagé (1 cluster est associé grossièrement à 1 gène)
-Chaque cluster est assemblé séparément.
-La stratégie Trinity se base sur le Graphe de Debreuil : reconstruction de la séquence totale à partir de fragment, le Graphe de Debreuil aborde le cas de fragments répétés dans la séquence
-
-
-Stratégie de l'assemblage: Assemblage à partir de l'ensemble des échantillons (IFN et CTRL)
-Sélection des reads bien appariés après nettoyage (exclusion des unpaired pour l'assemblage)
+To run Trinity, we indicated left reads (R1_paired) and rights reads (R2_paired)  files so that Trinity could process both reads types' informations separately.
+We also mentioned reads position and orientation on  fragments strains. In this study, sequencing was performed in "firstrand " (fr) or rf in Trinity. 
 
 Paramètre de commande:
 
@@ -92,7 +77,7 @@ Indiquer le CPU et le max mémory
 Read 1 correspond au Read apparié à gauche, Read 2 à doite, 
 -Indiquer le type du fichier (--seqType): fastq
 -Indiquer comment lire les reads (SS--lib--type): indique la position des reads sur les brins, leur sens d'orientaion  
-fr firststrand correspond à rf sur trinity
+
 R1 dans le sens 5'3', R1 sur le brin reverse de l'arnm
 R2 ont une séquence équivalente à ARNm
 CF: point Q1.9 (orientation of SENSE reads)
