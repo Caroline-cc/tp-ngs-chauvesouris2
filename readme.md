@@ -62,22 +62,39 @@ Reads quality was performed again with fastqc to assess trimming efficiency.
 
 (Personnellement non réalisé, retard,)
 
-## Genome assembly with Trinity (Mercre 18)
+## Transcriptome assembly with Trinity (Mercre 18)
 Since no genome is available for Myotis Velifer, we performed de novo genome assembly using transcriptomic datas from both interferon and control conditions.In line with a paired-end analysis, for all six libraries only paired reads outputs of Timommatic were used. Trinity assembles the transcriptome using a Debreui Graph strategy. Transcripts with similar sequences are grouped in clusters that roughly correspond to a gene. Each clusters are treated separately to finally reconstruct the genome.  
 
-To run Trinity, we indicated left reads (R1_paired) and rights reads (R2_paired)  files so that Trinity could process both reads types' informations separately.
-We also mentioned reads position and orientation on  fragments strains. In this study, sequencing was performed in "firstrand " (fr) or rf in Trinity. 
+To run Trinity, we indicated the fastqc format of the input files (--seqType) and precised left reads (R1_paired) and rights reads (R2_paired)files so that Trinity could process both reads types' informations separately.
+We also mentioned reads position and orientation on  fragments strains (SS--lib--type) for correct lecture of the reads. In this study, sequencing was performed in "firstrand " (fr) or rf in Trinity. 
+For more information on Trinity commands (memory and CPU), see Trinity.sh script
 
-Paramètre de commande:
+Trinity distinguishes transcripts isoforms (Trinity.fasta) and associate them to the corresponding gene (Trinity.fasta.gene_tras_map). In the assembled transcriptome outputs  processed reads are associated to a cluster (DN []_C[]), a gene (g[]) and an isoform (i []). 400 000 distinct transcripts were identified by Trinity and 311 364 genes (excluding  isoforms distinctions). These results are abnormally high if we compare with the 20 000 genes of human genome. This could be due to the inclusion of excessively short read for genome assembly.
 
-Indiquer le CPU et le max mémory 
+Once the transcriptom assembled, next step was to annotate it to identify transcripts' functions. Indeed, our final goal was to characterize gene differential expresion in antiviral responses in yotis Velufer.
+
+#Transcriptome annotation
+
+To identify coding regions within trinity transcripts sequences we used TransDecoder. ORFs were first identified running Transdecoder.Longorfs on assembled transcriptome (Trinity.fasta) with the gene correspondance (Trinity.fasta.gene_trans_map.). We retained only transcripts sequences encoding for proteins of at least 100 amino acidslong, with the m-parameter, see Transdecoder.sh
+Then, coding regions (CDS) candidates were detected by Transdecoder.Predict. We filtered regions with best coding , that appear in trinity.fasta.transdecoder.cds file. In this This final output are reported nucleotide sequences of the selected coding sequences.
+To infer the biological function of  these CDS we searched for sequence homologies with human CDS. Indeed, human CDS are better annotate than the genome of bats species  phylogenetically closer to Myotis velifer. 
+Homologies between Myotis Velifer identified CDS and Human CDS were searched with Blast. 
+Blast running requires to build a database listing human CDS. Those were downloaded from Ensembl online database with wget command. Then makeblastdb application enabled to organize those CDS in a database assigning an unique identifier to every sequence. Nucleotidic nature of the sequences and fasta format of downloaded CDS were indicated respectively with dbtype 'nucl'and -parse_seqids parameters.
+
+To  find sequences homologies, we align Myotis velifer selected CDS on human CDS database with blastn. Indeed both sequences in makeblastdb  database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. 
+ -faire code transdecoder + blast
+ -parler des paramètres de blastn
+
+#Blast sur séquences CDS humaines
+
+On charge les inputs, les CDS humains sur des bases de données 
+Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. Blast outputs: presented in 12 colnames 
+colnames(res) = c('qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore')
+(16/12 matin : mise au point de salmon quant et salmon index)
 
 
 2 séquences nucléotides à assembler parallèlement, correspondant aux 2 brins (associés à un read chacun)
 Read 1 correspond au Read apparié à gauche, Read 2 à doite, 
--Indiquer le type du fichier (--seqType): fastq
--Indiquer comment lire les reads (SS--lib--type): indique la position des reads sur les brins, leur sens d'orientaion  
-
 R1 dans le sens 5'3', R1 sur le brin reverse de l'arnm
 R2 ont une séquence équivalente à ARNm
 CF: point Q1.9 (orientation of SENSE reads)
@@ -87,11 +104,8 @@ NB: de nombreuses stratégies de séquençage en paired-end possibles
 Cf image corentin 
 https://ue-ngs-students.slack.com/files/U01DH0HMTDZ/F01F066R259/image.png
 
--Indiquer le nombre de coeurs disponible pour l'exécution (CPU 4)
 
-/!\ Données de RNA-seq très lourdes, (Trinity prendrait 2 jours et plus de 16 giga de ram) chaque membre du TP traite un échantillon.
-Test de lancement de Trinity puis arrêt du programme avec "kill"
-Données assemblées (obtenues précédemment) fournies par les encadrants Cf dossier transfer_trinity
+
 
 ## 
 
@@ -99,14 +113,11 @@ Chauve-souris groupe 2: travail sur la quantification de l'expression génique (
 Chauve-souris groupe 1: Travail sur la phylogénie des duplications de PKR
 Alignement multi-séquences avec PRANK
 
-Analyse des sorties de Trinity:
 
-Sorties de trinity dans un fichier Trinity.fasta (transfert par Marie, données non obtenues par running du programme)
-Chaque transcript assemblé est signalé par une ligne commençant par un chevron.
-Un transcript est noté sous un format :  >TRINITY_DN1000_c115_g5_i1 indiquant le cluster du read (DN []_C[]), le gène (g[]) et l'isoforme 
 
-Sortie du nombre de transcripts assemblés par Trinity: envrion 400 mille transcripts. 
-Comptage du nombre de gènes (exclusion des isofromes) : 300 000 gènes, nombre excessif sans doute dû à des reads trop courts assemblés. 
+
+
+Sorti 
 
 ## Présentation Lucie Etienne (Mecredi 18): faire le topo  question biologique etc...
 
@@ -135,16 +146,10 @@ Tximport outputs "abundance","counts", length""
 ## Annoter les gènes transcripts : 2 approches
 Objectif:   avoir une vision fonctionnelle des transcripts dans le cadre de l'étude la réponse antivirale chez les chauve souris en cherchant des homologies de séquence.
 
-Blast: programme pour trouver des alignements locaux. Adapté pour la recherche d'alignements de séquences PKR avec la basse de données obtenue. Pour létude fonctionnelle des transcripts, comparaison avec des CDS humains, car CDS humains mieux annotés en identifiant des homologues de gènes bien caractérisés.
+Blast: programme pour trouver des alignements locaux. Adapté pour la recherche d'alignements de séquences PKR avec la basse de données obtenue. 
 
-Transdecoder: Permet d'identifier les contigs de Trinity contenant des séquences codantes.  C
 
-#Blast sur séquences CDS humaines
 
-On charge les inputs, les CDS humains sur des bases de données 
-Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. Blast outputs: presented in 12 colnames 
-colnames(res) = c('qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore')
-(16/12 matin : mise au point de salmon quant et salmon index)
 # Expression différentielle
 
 Premier étape: To import estimates of transcripts-level abundance, we use tximport pipeline  importer les données de quantification des transcripts (fichiers salmon, paired end ) pour l'analyse par DESeq
