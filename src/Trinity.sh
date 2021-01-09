@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#Default folder
+#Create working directory
 data="/ifb/data/mydatalocal/outputs"
 mkdir -p $data
 cd $data
@@ -21,6 +21,8 @@ echo $rightseq
 #Trinity instructions
 Trinity --seqType fq --max_memory 14G --left $leftseq --right $rightseq --CPU 4 --SS_lib_type RF --output $data/output_trinity
 
+#Count identified genes in Trinity outputs (different transcripts independently from isoforms)
+grep ">" mydatalocal/transfer_trinity/Trinity.fasta |cut -f1,2,3,4 -d "_"|sort |uniq |wc -l
 
 ## fonction paste pour coller des chaînes de caractères
 ## -d "," pour délimiter les séquences nucléotides des reads forward/reverse par des virgules
