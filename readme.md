@@ -81,16 +81,17 @@ To infer the biological function of  these CDS we searched for sequence homologi
 Homologies between Myotis Velifer identified CDS and Human CDS were searched with Blast. 
 Blast running requires to build a database listing human CDS. Those were downloaded from Ensembl online database with wget command. Then makeblastdb application enabled to organize those CDS in a database assigning an unique identifier to every sequence. Nucleotidic nature of the sequences and fasta format of downloaded CDS were indicated respectively with dbtype 'nucl'and -parse_seqids parameters.
 
-To  find sequences homologies, we align Myotis velifer selected CDS on human CDS database with blastn. Indeed both sequences in makeblastdb  database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. 
+To  find sequences homologies, we align Myotis velifer selected CDS on human CDS database with the blastn program. Indeed both sequences in blast database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. We chose to only select one hit result for every asembled contig (-max_target_seqs parameter) and limited blast e-value of 10<sup>-4</sup>, meaning that the probability this hit occured by chance would be one on 10 000. The first 6 aligned CDS were visualized with -outfmt parameter. 
  -faire code transdecoder + blast
- -parler des paramètres de blastn
+In parallel with the annotation of the assembled transcriptome another step was to quantify transcripts expression.
+## Transcripts quantification: Salmon
 
-#Blast sur séquences CDS humaines
 
-On charge les inputs, les CDS humains sur des bases de données 
-Première étape : préparation d'une banque de data adaptée pour y faire tourner blast. Blast outputs: presented in 12 colnames 
-colnames(res) = c('qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen', 'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore')
-(16/12 matin : mise au point de salmon quant et salmon index)
+To determine transcripts levels in control and interferon conditions,we used Salmon software. It align reads on transcripts and quantifies reads number for every transcripts.
+*Building of an index for Salmon quasi-mapping
+Salmon index is independent from the experiment specific reads. 
+It list all sequences of a fixed length k (k-mères) that could sequence a given transcript. 
+ 
 
 
 2 séquences nucléotides à assembler parallèlement, correspondant aux 2 brins (associés à un read chacun)
@@ -107,19 +108,9 @@ https://ue-ngs-students.slack.com/files/U01DH0HMTDZ/F01F066R259/image.png
 
 
 
-## 
-
-Chauve-souris groupe 2: travail sur la quantification de l'expression génique (gènes ISGs)suite à la stimulation IFN
-Chauve-souris groupe 1: Travail sur la phylogénie des duplications de PKR
-Alignement multi-séquences avec PRANK
 
 
 
-
-
-Sorti 
-
-## Présentation Lucie Etienne (Mecredi 18): faire le topo  question biologique etc...
 
 
 ## Remappin des reads sur le transcriptome assemblé: Salmon (Mercredi 18)
