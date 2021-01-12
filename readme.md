@@ -7,6 +7,7 @@ output:
 
 # TP NGS CHAUVE-SOURIS2
 
+
 ##Introduction
 
 Bats are frequently exposed to  a large spectrum of viruses but seem asymptomaric. This suggest specific bat's immunity responses developed through a long -term cohabitation with viruses. Bat's immunity would have reached an equilibrium between viral resistance and tolerance. High tolerance to viruses is thought to be due to a particularly performant antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Insterferon Stimulated Genes (ISG). Some ISG protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
@@ -17,11 +18,12 @@ Moyen: Production et analyse de données transcriptomique pour caractériser  le
 
 
 ## Obtention of biological datas
+
 Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
 ![GitHub Logo](/images/paired-end-read-1.png){width=30%} 
 -from thesequencingcenter.com-
 
-## Téléchargement des données de RNA-seq (Lundi 16)
+## Téléchargement des données de RNA-seq 
 Reading: single-end ou paired-end?
 RNA-seq en single-end: lit le fragment d'ARN d'un bout à l'autre,
 RNA-seq en paired-end:"sorte d'aller -retour" 2 reads, un sur chacun des brins, orientés dans des sens opposés
@@ -32,7 +34,7 @@ Ici, pour chaque échantillon, on a bien un Read 1 et un Read 2, chacun d'enviro
 
 We first assessed the quality of reads' sequencing to determine if sequencing datas were reliable for transcriptome assembly. 
 
-## Assessment of RNA-seq datas' quality: Fastqc (Mard 17)
+## Assessment of RNA-seq datas' quality: Fastqc 
 
 To determine reads'quality we ran the fastqc program on each type of reads (forward and reverse) in all samples. 
 -Cf:Testdequalite file-
@@ -51,7 +53,8 @@ The "Per sequence quality scores" indicated a good overall quality score in the 
 Considering the relative quality of RNA-seq datas, especially the dropping at sequences'end, we cleaned the datas. Indeed, a low row datas quality could biased following analysis.; 
 --> Qualité moyenne des donées de RNA-seq, nécessité d'un nettoyage pour ségréger les read appariés et non appariés 
 
-## Cleaning of RNA-seq datas: Trimommatic (Mar 17)
+## Cleaning of RNA-seq datas: Trimommatic 
+
 Before genome assembly we cleaned datas with Trimommatic.
 Note that cleaning step can also be treated with genome assembly combining program running. To treat paired reads, we ran Trimmomatic in a paired-end (PE) mode distinguishing froward and reverse read files as inputs.Nucleotides with a quality score or phred score threhold of 33 were filtered. In others words, bases with an incorrect probability call superior to 10^E -3 were eliminated. Short reads with a length below 100 bases were removed with MINLEN software, and the first 9 bases of each reads were suppressed (HEADCROP). Adaptators and illumina related sequences were also suppressed of reads (ILLUMINACLIP) Indeed adaptaters can be sequenced when if they dimerize or if they are readen as the prolongement of short DNA fragments by the sequencer. We could have removed starting or ending bases of reads, below a defined quality threshold with leading and trailing.  
 Paired and unpaired  reads resulting from Trimmomatic cleaning were  distinguished  in dedicated output files, for each forward and reverse reads 
@@ -84,13 +87,34 @@ Blast running requires to build a database listing human CDS. Those were downloa
 To  find sequences homologies, we align Myotis velifer selected CDS on human CDS database with the blastn program. Indeed both sequences in blast database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. We chose to only select one hit result for every asembled contig (-max_target_seqs parameter) and limited blast e-value of 10<sup>-4</sup>, meaning that the probability this hit occured by chance would be one on 10 000. The first 6 aligned CDS were visualized with -outfmt parameter. 
  -faire code transdecoder + blast
 In parallel with the annotation of the assembled transcriptome another step was to quantify transcripts expression.
-## Transcripts quantification: Salmon
+
+## Transcripts quantification
 
 
-To determine transcripts levels in control and interferon conditions,we used Salmon software. It align reads on transcripts and quantifies reads number for every transcripts.
+To determine transcripts levels in control and interferon conditions,we used Salmon software. It aligns reads on corresponding transcripts for quantification.  
+
+
 *Building of an index for Salmon quasi-mapping
-Salmon index is independent from the experiment specific reads. 
-It list all sequences of a fixed length k (k-mères) that could sequence a given transcript. 
+
+Salmon quantification requires an index listing  fragments of a fixed length k (k-mères) that could sequence each given transcript. Indeed, Salmon does not perform a per base alignment but rather detect matches with transcripts sequences for quantification.  We thus establish salmon index with trinity outputs keeping the default value k=31 for listed k-mères. 
+
+
+*Salmon quantification
+
+For analysis reliability, we quantified only the paired reads, previously trimmed with Trimmomatic. We also implement Salmon quantification accuracy through the GC bias inclusion (--gcBias command) and a more selective mapping algorithm for alignement (--validateMappings command).
+Among quant outputs, we focused on the transcripts per million (TPM)results. It corresponds to an fine estimation of transcripts quantities through gene length   and deepthness sequencing normalization of row counts. 
+
+Surprisingly, on average only  40% of reads were aligned by Salmon (mapping rate result), which suggests an important loss of data and a possible underestimated quantification. Indeed, Salmon excludes reads with insufficient alignment and imperfect final sequence matches. 
+
+![GitHub Logo](/images/head-quantoutputs_lib1.png){width=30%} 
+
+*Extract of salmon quantification outputs for paired reads of the first library (CTL). 
+
+
+As shown above, Salmon provide probabilistic values of 
+
+quantification is isoform specific. To determine gene- level  expression  we used the tximport package that sums same-gene-derived transcripts informations. To this purpose we create a dataframe (tx2gene=trini1) based on  Trinity gene transmap associating transcripts ID to gene IDs.
+Thus Tximport summed the Salmon transcripts level datas for each corresponding gene. Tximport outputs are thus provide probabilistic values of gene length and corresponding reads' count and  abundance.  
  
 
 
@@ -115,53 +139,36 @@ https://ue-ngs-students.slack.com/files/U01DH0HMTDZ/F01F066R259/image.png
 
 ## Remappin des reads sur le transcriptome assemblé: Salmon (Mercredi 18)
 
-Quantification consiste basiquement à déterminer combien de reads s'alignent sur un transcript. 
+
 Génération d'un index pour faciliter (plus rapide) l'alignement des reads sur le transcript via salmon index.
 
 Quantification via salmon quant. 
 Indication d'un squençage en paired end 
 ésultats du running de  salmon quant jugés bons pour plus de 80% des reads alignés
-Sorties de salmons indiquent le transcript ID pas le gène ID
-
-To summarize the transcript-level into gene level: tximport
-Tximport outputs "abundance","counts", length""
 
 
-
-## A la 2 eme semaine: 
--Revoir les scripts, faire tourner (sauf Trinity --> faire un kill)
--Revoir le protocole de création de Library
--Revoir Salmon : principe + script opérationnel? (non testé)
 
 
 ## Annoter les gènes transcripts : 2 approches
 Objectif:   avoir une vision fonctionnelle des transcripts dans le cadre de l'étude la réponse antivirale chez les chauve souris en cherchant des homologies de séquence.
 
-Blast: programme pour trouver des alignements locaux. Adapté pour la recherche d'alignements de séquences PKR avec la basse de données obtenue. 
 
 
+# Diferential expression
+OnCe obtained gene expression levels, we could compare the transcription profile between control and interferon-treated conditions. We thus create a data set (ddsTxi) with Tximport gene-level quantification data in the 6 samples and the corresponding experimental conditions (see dimensions ddsTxi: 311 364 genes or rownames and 6colnames or samples). To calculate gene  differential  expression between conditions, we use DESeq2 function on this data set.
 
-# Expression différentielle
+![GitHub Logo](/images/dds_res.png){width=50%} 
 
-Premier étape: To import estimates of transcripts-level abundance, we use tximport pipeline  importer les données de quantification des transcripts (fichiers salmon, paired end ) pour l'analyse par DESeq
-Deuxième étpe: lecture du mapping de trinity et sélection des colonnes d'intérêt
-Construction d'une table associant données de quantitification et transcriptiomiqe 
-Création d'un data set pour y appliquer la fonction DESeq avec DESeq2 
-*class: DESeqDataSet 
-dim: 311364 6 
-metadata(1): version
-assays(2): counts avgTxLength
-rownames(311364): TRINITY_DN0_c0_g1 TRINITY_DN0_c0_g2 ... TRINITY_DN99998_c0_g1
-  TRINITY_DN99999_c0_g1
-rowData names(0):
-colnames(6): Lib1_31_20_S1 Lib2_31_20_S2 ... Lib5_31_20_S5 Lib6_31_20_S6
-colData names(2): run condition*
+DESeq2 output provide for each gene a control condition normalized level of expression (BaseMean). The log2 foldchange informs on the ratio between the expression mean of both conditions. The p-value indicate the probability to observe a differential expression under H0 hypothesis (by chance). Consequently to gene-level summarization of transcripts expression, an adjustment of the p-value is necessary (padj). Indeed, assembled isoforms value could lead to repetition-induced statistical difference.  
+We looked at the genes for which the padj was lower than 0,1. 1745 genes on 295 779 were found with a significant differential expression (padj<0,1) under interferon treatment. 
 
-Outputs de DESeq donnent le niveau d'expression en condition test normalisé par le niveau d'expression en condition contrôle,  log2foldchange qui correspond au rapport des moyennes d'expression dans les 2 conditions: IFN et CTRL 
-
-Anlayse pour les 311364 types de transcripts différents (~gènes) dans les 6 échantillons 
-Analysing all 6 samples (libraries) 1745 genes with a significantly different expression were found on 294034
 Analysing the 5 samples (libraries) 1896 genes on 287 553 analyzed were fund with a significantly different expression comparing control and interferon treatment 
+
+
+*Graphic readout
+
+We visualized genes with a log fold change ranging from -2 (downregulated) to 2 (upregulated) in function of the normalized mean expression with MA plot.
+This points that most of the genes with significant differential expression (in blue) are upregulated one.
 
 
 #Caractérisation des gènes présentant une expression différentielle en condition interféron
