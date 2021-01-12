@@ -5,10 +5,10 @@ output:
   pdf_document: default
 ---
 
-# TP NGS CHAUVE-SOURIS2
+# Characterization of the Interferon transcriptomic response  in a microbat species
 
 
-##Introduction
+## Introduction
 
 Bats are frequently exposed to  a large spectrum of viruses but seem asymptomaric. This suggest specific bat's immunity responses developed through a long -term cohabitation with viruses. Bat's immunity would have reached an equilibrium between viral resistance and tolerance. High tolerance to viruses is thought to be due to a particularly performant antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Insterferon Stimulated Genes (ISG). Some ISG protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
 Here we aimed at identifying genes stimulated by the interferon response in Myotis velifer specie of microbat. Analyses were performed on transcriptomic data collected by L.E's scientific team. Analyses first consisted in transcriptome assembly and annotation steps. Then trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with known human corresponding ISGs.  
@@ -20,7 +20,8 @@ Moyen: Production et analyse de données transcriptomique pour caractériser  le
 ## Obtention of biological datas
 
 Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
-![GitHub Logo](/images/paired-end-read-1.png){width=30%} 
+![GitHub Logo](/images/paired-end-read-1.png) {width=30%}  
+
 -from thesequencingcenter.com-
 
 ## Téléchargement des données de RNA-seq 
@@ -60,12 +61,11 @@ Note that cleaning step can also be treated with genome assembly combining progr
 Paired and unpaired  reads resulting from Trimmomatic cleaning were  distinguished  in dedicated output files, for each forward and reverse reads 
 Reads quality was performed again with fastqc to assess trimming efficiency. 
 
+A second quality testing of RNA datas was made to assess the cleaning.
 
-## Second quality test of RNA-seq datas (fastqc)
 
-(Personnellement non réalisé, retard,)
 
-## Transcriptome assembly with Trinity (Mercre 18)
+## Transcriptome assembly with Trinity
 Since no genome is available for Myotis Velifer, we performed de novo genome assembly using transcriptomic datas from both interferon and control conditions.In line with a paired-end analysis, for all six libraries only paired reads outputs of Timommatic were used. Trinity assembles the transcriptome using a Debreui Graph strategy. Transcripts with similar sequences are grouped in clusters that roughly correspond to a gene. Each clusters are treated separately to finally reconstruct the genome.  
 
 To run Trinity, we indicated the fastqc format of the input files (--seqType) and precised left reads (R1_paired) and rights reads (R2_paired)files so that Trinity could process both reads types' informations separately.
