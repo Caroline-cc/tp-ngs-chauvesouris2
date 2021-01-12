@@ -106,7 +106,7 @@ Among quant outputs, we focused on the transcripts per million (TPM)results. It 
 
 Surprisingly, on average only  40% of reads were aligned by Salmon (mapping rate result), which suggests an important loss of data and a possible underestimated quantification. Indeed, Salmon excludes reads with insufficient alignment and imperfect final sequence matches. 
 
-![GitHub Logo](/images/head-quantoutputs_lib1.png){width=30%} 
+![GitHub Logo](/images/head-quantoutputs_lib1.png|width=30%)
 
 *Extract of salmon quantification outputs for paired reads of the first library (CTL). 
 
