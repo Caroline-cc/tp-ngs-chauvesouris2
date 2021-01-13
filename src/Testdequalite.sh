@@ -1,25 +1,25 @@
 #! /bin/bash
+# Analysis of RNA-seq data quality with fastqc
 
-# Indication du dossier par défaut
+# Create a working directory
 
 data="/home/rstudio/data/mydatalocal/data"
 mkdir -p $data
 cd $data
 
-#Dossier spécifique d'outputs de fastqc
+# Create a directory for fastqc outputs 
 
-outputfastqc="fastqc-data"
-mkdir -p $outputfastqc
-cd $outputfastqc
+output_fastqc="fastqc-data"
+mkdir -p $output_fastqc
+cd $output_fastqc
 
-# Récupération des données de RNA-seq téléchargées
+# Importation of downloaded RNA-seq data
 
 home_fastq="home/rstudio/data/mydatalocal/download/sharegate-igfl.ens-lyon.fr"
 fastq=$home_fastq/"*.gz"
 ## le * indique qu'on le fait sur tous les fichiers dans repertory home_fastq
 
-# Test de qualité fast qc
-## Utilisation d'une boucle for
+# Run quality test with fastqc
 
 for sample in  $fastq
 do
