@@ -1,4 +1,5 @@
 #! /bin/bash
+# De novo transcriptome assembly with Trinity
 
 #Create working directory
 data="/ifb/data/mydatalocal/outputs"
@@ -18,10 +19,16 @@ echo $leftseq
 echo $rightseq
 
 
-#Trinity instructions
+#Run Trinity 
 Trinity --seqType fq --max_memory 14G --left $leftseq --right $rightseq --CPU 4 --SS_lib_type RF --output $data/output_trinity
 
-#Count identified genes in Trinity outputs (different transcripts independently from isoforms)
+#Analysis of the assembled transcriptome (in transferred trinity outputs)
+
+##Count isoform-specific transcripts identified by Trinity
+grep -c ">" mydatalocal/transfer_trinity/Trinity.fasta
+
+#Count corresponding (different transcripts independently from isoforms)
+
 grep ">" mydatalocal/transfer_trinity/Trinity.fasta |cut -f1,2,3,4 -d "_"|sort |uniq |wc -l
 
 ## fonction paste pour coller des chaînes de caractères
