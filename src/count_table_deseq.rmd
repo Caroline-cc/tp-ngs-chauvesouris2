@@ -129,7 +129,7 @@ library(ggplot2) #graphs
 
 ```{r}
 #Import blast alignment datas 
-blastHomo<-read.table("/ifb/data/mydatalocal/download/DataBats.blast")
+blastHomo<-read.table("/home/rstudio/data/mydatalocal/outputs/output_blast/blastdb_hum")
 blastHomo<-data.table(blastHomo)
 head (blastHomo)
 ```
@@ -156,10 +156,10 @@ resUsNamewo3
 
 View(resUsName)
 View(resUsNamewo3)
-write.csv(resUsName,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
+write.csv(resUsName,file="/ifb/data/mydatalocal/outputs/output_DE_align/count_blast_deseq")
 
 
-write.csv(resUsNamewo3,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
+write.csv(resUsNamewo3,file="/ifb/data/mydatalocal/outputs/output_DE_align/count_blast_deseq")
 #pour télécharger le tableau de résultats
 
 ```
@@ -169,14 +169,14 @@ write.csv(resUsNamewo3,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
 #Classification de resUsName:our table
 AllReg <- filter(resUsName, padj<0.05)
 AllReg
-write.csv(AllReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_allreg")
+write.csv(AllReg,file="/ifb/data/mydatalocal/outputs/output_DE_align/count_blast_deseq_allreg")
 
 UpReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange>0)
 View(UpReg)
-write.csv(UpReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_up")
+write.csv(UpReg,file="/ifb/data/mydatalocal/outputs/output_DE_align/count_blast_deseq_up")
 
 DownReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange<0)
-write.csv(DownReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_down")
+write.csv(DownReg,file="/ifb/data/mydatalocal/outputs/output_DE_align/count_blast_deseq_down")
 
 
 ```
