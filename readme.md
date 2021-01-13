@@ -185,7 +185,8 @@ To identify visually upregulated genes, we also displayed DESeq2 results n a hea
 We also built a two different principal component analysis (PCA) plot to compare differential gene expression between the 6 samples.
 As expected, the transcriptomic profiles of Lib4, 5 abd 6 corresponding to control samples well clustered. However, the Lib 3 sample importantly standed out the cluster of other IFN-treated samples. This indicates radically different RNA seq datas from this library that could be due to different RNA-seq quality (batch effect) or cell populations/conditions. In fact, RNA bank for the 3 rd sample was obtained in another session. Distinct environment parameters in these session could then have impact the transcription profile. 
 
-<img src="PCA_ech6.png" alt="legend (PCA)" width="50%"/>
+<img src="images/PCA_ech6.png" alt="legend (PCA)" 
+width="50%"/>
 
 Repeating DE analysis, excluding divergent Lib 3 from the data set we obtained distinct results (ddsTxi_wo3). The number of differentially expresseg genes (padj<0,1) was higher, with 1896 genes on 289 449. The RNA seq data of control and interferon respectively well clustered in the PCA plot, indicating homogeneous profiles. 
 
@@ -195,21 +196,22 @@ Nevertheless, considering the few number of replicates pe conditon (3), we chose
 
 To  annotate the identified deferentially expressed genes, we used BiomaRt software. We associate identifiers from Ensembl to external human gene names (see **tx2geneHomo** table). We then merge it with blast alignments to get a table of differentially expressed transcripts, at a gene-level with human gene annotation (see **blastHomoNameUniq**).  
 
-<img src="resus_upreg.png" alt="legend (countblast_upreg)" width="50%"/>
-*Extract of upregulated genes' name (padj<O,O5) in interferon treated condition, and related data obtained with DESeq2*     
+<img src="images/resus_upreg.png" alt="legend (countblast_upreg)"
+width="50%"/>
 
+*Extract of upregulated genes' name (padj<O,O5) in interferon treated condition, and related data obtained with DESeq2*
 
-* *Identification of interferon-modulated pathways*
+* **Identification of interferon-modulated pathways**
 
 To better characterize the transcriptomic response to interferon in *Myotis Velifer*, we performed a gene ontology analysis with Gorilla. 
 
 We entered DESeq2 results (see outputs/output_DE_align/ **count_blast_deseq_up** for instance) to visualize gene corresponding  biological pathways. 
 
-<img src="GO_ech6_upreg_process_def.png" alt="legend (Gene ontology_upreg)" width="50%"/> 
+<img src="images/GO_ech6_upreg_process_def.png" alt="legend (Gene ontology_upreg)" width="50%"/> 
 
 *Extract of biological processes in which IFN-upregulated genes (padj<0.05) are implied. Antigen presentation and defense response to virus processes appear especially upregulated.* 
 
-* *Results validity and current literature*
+* **Results validity and current literature**
 
 To get an idea of our results'validity we compare them with a recent similarly- designed transcriptomic study by Holzer (see https://www.sciencedirect.com/science/article/pii/S2589004219302949).
 This study characterized the interferon response of  a kidney-cell line of M. daubentonii species. 
