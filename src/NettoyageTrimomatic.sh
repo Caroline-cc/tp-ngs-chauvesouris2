@@ -1,21 +1,21 @@
 #! /bin/bash
 
 
-# Créer un chemin
+# Indicate the curent directory path 
 data="/ifb/data/mydatalocal/data"
 cd $data
 
-#Dossier spécifique pour les outputs de Trimmomatic
+#Create a directory for Trimmomatic outputs (trimmed reads)
 
 output_trimmomatic="/ifb/data/mydatalocal/outputs/output_trimmomatic"
 #ou output_trimmomatic=$data"/outputs/output_trimmomatic"
 mkdir -p $output_trimmomatic
 cd $output_trimmomatic
 
-# Création de la variable read
+# Create the variable "reads" 
 
 reads="/home/rstudio/data/mydatalocal/download/sharegate-igfl.ens-lyon.fr/Projet_31_20_UE_NGS_2020/FASTQ/"
-## cd $readspas nécessaire
+## "cd $reads" not necessary
 
 libs=`ls $reads| cut -f1,2,3,4 -d "_" | sed 's/ /_/g'|uniq`
 
