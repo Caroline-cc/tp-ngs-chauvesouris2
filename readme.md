@@ -13,6 +13,8 @@ output:
 Bats are frequently exposed to  a large spectrum of viruses but seem asymptomaric. This suggest specific bat's immunity responses developed through a long -term cohabitation with viruses. Bat's immunity would have reached an equilibrium between viral resistance and tolerance. High tolerance to viruses is thought to be due to a particularly performant antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Insterferon Stimulated Genes (ISG). Some ISG protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
 Here we aimed at identifying genes stimulated by the interferon response in Myotis velifer specie of microbat. Analyses were performed on transcriptomic data collected by L.E's scientific team. Analyses first consisted in transcriptome assembly and annotation steps. Then trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with known human corresponding ISGs.  
 
+<img src="images/workflow_tp.png" alt="legend (paired end sequencing)" width="50%"/>
+
 Problème: Pas de datas de transcriptomique pour l'espèce Myotis velifer disponibles dans les bases de données
 Moyen: Production et analyse de données transcriptomique pour caractériser  le profil d'expression des gènes en réponse interféron de Myotis velifer
 
@@ -20,7 +22,7 @@ Moyen: Production et analyse de données transcriptomique pour caractériser  le
 ## Obtention of biological datas
 
 Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
-![GitHub Logo](/images/paired-end-read-1.png){width=30%} 
+
 
 
 <img src="images/paired-end-read-1.png" alt="legend (paired end sequencing)" width="50%"/>
@@ -158,48 +160,53 @@ Objectif:   avoir une vision fonctionnelle des transcripts dans le cadre de l'é
 
 
 # Diferential expression
-OnCe obtained gene expression levels, we could compare the transcription profile between control and interferon-treated conditions. We thus create a data set (ddsTxi) with Tximport gene-level quantification data in the 6 samples and the corresponding experimental conditions (see dimensions ddsTxi: 311 364 genes or rownames and 6colnames or samples). To calculate gene  differential  expression between conditions, we use DESeq2 function on this data set.
+Once obtained gene expression levels, we could compare the transcription profile between control and interferon-treated conditions (see **count_table_deseq.rmd** file for downstream analysis). We thus create a dataset (ddsTxi) with Tximport gene-level quantification data in the 6 samples and the corresponding experimental conditions (see ddsTxi dimensions : 311 364 genes or rownames and 6colnames or samples). To calculate gene  differential  expression between conditions, we use DESeq2 function on this deseq dataset.
 
 ![GitHub Logo](/images/dds_res.png){width=50%} 
 
-* Gene expression level analysis with DESeq2
+* **Gene expression level analysis with DESeq2**   
+
 DESeq2 output provide for each gene a control condition normalized level of expression (BaseMean). The log2 foldchange informs on the ratio between the expression mean of both conditions. The p-value indicate the probability to observe a differential expression under H0 hypothesis (by chance). Consequently to gene-level summarization of transcripts expression, an adjustment of the p-value is necessary (padj). Indeed, assembled isoforms value could lead to repetition-induced statistical difference.  
 We looked at the genes for which the padj was lower than 0,1. 1745 genes on 295 779 were found with a significant differential expression (padj<0,1) under interferon treatment. 
 
-Analysing the 5 samples (libraries) 1896 genes on 287 553 analyzed were found with a significantly different expression comparing control and interferon treatment 
+Analysing the 5 samples (libraries) 1896 genes on 287 553 analyzed were found with a significantly different expression comparing control and interferon treatment   
 
 
-*Graphic readout of DE results
 
-We visualized genes with a log fold change ranging from -2 (downregulated) to 2 (upregulated) in function of the normalized mean expression with MA plot.
-This points that most of the genes with significant differential expression (in blue) are upregulated one.
+* **Graphic readout of DE results**
 
-<img src="plotMA_ech6.png" alt="legend (plotMA)" width="50%"/>
+We visualized genes with a log fold change ranging from -2 (downregulated) to 2 (upregulated) in function of the normalized mean expression with MA plot.It points that most of the genes with significant differential expression (in blue) are upregulated oneS.
+
+<img src="images/plotMA_ech6.png" alt="legend (plotMA)" width="60%"/>
+*MA plot obtained with DESeq2 results on the 6 samples.*
 
 To identify visually upregulated genes, we also displayed DESeq2 results n a heatmap format.   
 
-<img src="heatmapUpReg.png" alt="legend (HeatMap)" width="50%"/>
+<img src="images/heatmapUpReg.png" alt="legend (HeatMap)" width="50%"/>
+*Heatmap of the first ten upregulated genes (padj<0.05)*
 
-* Analysis of DESeq2 dataset homogeneity
+* **Analysis of DESeq2 dataset homogeneity**
+
 
 We also built a two different principal component analysis (PCA) plot to compare differential gene expression between the 6 samples.
-As expected, the transcriptomic profiles of Lib4, 5 abd 6 corresponding to control samples well clustered. However, the Lib 3 sample importantly standed out the cluster of other IFN-treated samples. This indicates radically different RNA seq datas from this library that could be due to different RNA-seq quality (batch effect) or cell populations/conditions. In fact, RNA bank for the 3 rd sample was obtained in another session. Distinct environment parameters in these session could then have impact the transcription profile. 
+As expected, the transcriptomic profiles of Lib4, 5 and 6, corresponding to control samples, well clustered. However, the Lib 3 sample significantly standed out the cluster of other IFN-treated samples. This indicates radically different RNA seq datas from this library that could be due to different RNA-seq quality (batch effect) or cell populations/conditions. In fact, RNA bank for the 3<sup> rd</sup> sample was obtained in another session. Distinct environment parameters in these session could then have impact the transcription profile. 
 
 <img src="images/PCA_ech6.png" alt="legend (PCA)" 
-width="50%"/>
+width="70%"/>
 
-Repeating DE analysis, excluding divergent Lib 3 from the data set we obtained distinct results (ddsTxi_wo3). The number of differentially expresseg genes (padj<0,1) was higher, with 1896 genes on 289 449. The RNA seq data of control and interferon respectively well clustered in the PCA plot, indicating homogeneous profiles. 
+*PCA plot obtained with DESeq2 results on the 6 samples*
+Repeating DE analysis, excluding divergent Lib 3 from the dataset we obtained distinct results (see **ddsTxi_wo3**). The number of deferentially expressed genes (padj<0,1) was higher, with 1896 genes on 289 449. The RNA seq data of control and interferon respectively well clustered in the PCA plot, indicating homogeneous profiles. 
 
 Nevertheless, considering the few number of replicates pe conditon (3), we chose to conserve the 3rd sample in downstream analysis, for better statistical power.
 
-* Human annotation of interferon responsive genes
+* **Human annotation of interferon responsive genes**
 
 To  annotate the identified deferentially expressed genes, we used BiomaRt software. We associate identifiers from Ensembl to external human gene names (see **tx2geneHomo** table). We then merge it with blast alignments to get a table of differentially expressed transcripts, at a gene-level with human gene annotation (see **blastHomoNameUniq**).  
 
 <img src="images/resus_upreg.png" alt="legend (countblast_upreg)"
-width="50%"/>
+width="70%"/>
 
-*Extract of upregulated genes' name (padj<O,O5) in interferon treated condition, and related data obtained with DESeq2*
+*Extract of upregulated genes' name (padj<0.05) in interferon treated condition, and related data obtained with DESeq2.*
 
 * **Identification of interferon-modulated pathways**
 
@@ -217,7 +224,7 @@ To get an idea of our results'validity we compare them with a recent similarly- 
 This study characterized the interferon response of  a kidney-cell line of M. daubentonii species. 
 
 
-We selected common genes to Holzer study and ours (see **Holzer_resUs**) and searched for a convergence of their transcriptomic profile. Among common identified genes, 232 showed a differential expression in bothstudies. Chi2 analysis showed a statitical significance of convergent transcriptomic profiles between Holzer and our common genes. 
+We selected common genes to Holzer study and ours (see outputs/output_DE_align**Holzer_resUs**) and searched for a convergence of their transcriptomic profile. Among common identified genes, 232 showed a differential expression in bothstudies. Chi2 analysis showed a statitical significance of convergent transcriptomic profiles between Holzer and our common genes. 
 Among common upregulated genes, we found typical ISGs such as SAMD9 (see the **heatmap**), IFI44, IFIH1 and others. Interestingly some well-known ISGs like OAS1, ISG15 were not observed in our study. Nevertheless, reciprocally, some found upregulated genes, like SP100 do not seem to be classified as ISGs. 
 
 ## Conclusion and perspectives:
