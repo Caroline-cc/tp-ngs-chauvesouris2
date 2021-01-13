@@ -22,17 +22,13 @@ gunzip $output_blast/Homo_sapiens.GRCh38.cds.fa.gz
 hu_cds=$output_blast/Homo_sapiens.GRCh38.cds.fa  # human coding sequence
 transdec_cds=$data/outputs/transdec_data/Trinity.fasta.transdecoder.cds  # transdecoder coding sequences (query)
 
-##Create output directories
-humCDS_db="$data/outputs/output_blast/humCDS_db"
-blastdb_hum="$data/outputs/output_blast/blastdb_hum"
-mkdir -p $humCDS_db
-mkdir -p $blastdb_hum
+
 
 ## Makeblastdb to create it
-/softwares/ncbi-blast-2.10.1+/bin/makeblastdb -in $hu_cds -dbtype 'nucl' -out "humCDS_db" -parse_seqids
+/softwares/ncbi-blast-2.10.1+/bin/makeblastdb -in $hu_cds -dbtype 'nucl' -out $data/outputs/output_blast/"humCDS_db" -parse_seqids
 
 ## Blastn to align our identied coding sequences (query) on the database
-/softwares/ncbi-blast-2.10.1+/bin/blastn -db "humCDS_db" -query $transdec_cds -evalue 1e-4 -outfmt 6 -out "blastdb_hum" -max_target_seqs 1
+/softwares/ncbi-blast-2.10.1+/bin/blastn -db $data/outputs/output_blast/"humCDS_db" -query $transdec_cds -evalue 1e-4 -outfmt 6 -out $data/outputs/output_blast/"blastdb_hum" -max_target_seqs 1
 
 
 ##parse_sequid permet d'avoir une entrée fasta. Format de banque blast
