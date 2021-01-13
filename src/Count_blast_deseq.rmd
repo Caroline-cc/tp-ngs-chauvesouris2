@@ -3,72 +3,135 @@ title: "croisementblast"
 output: html_document
 ---
 
-```{Librairie Biomart}
+```{Librairie BiomaRt}
+
+ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
+tx2geneHomo = biomaRt::getBM(attributes=c('ensembl_transcript_id', 
+                                      'ensembl_gene_id', 'external_gene_name'),mart=ensembl)
+library(biomaRt)
+```
+```
+
+
+```{Vérification de l'installation d'autres packages}
 library(dplyr)
 library(tidyr)#restart R si pb (aller dans session)
 library(data.table)
 library(ggplot2) #graphs
 
 ```
-```{r}
-library(dplyr)
-library(tidyr)
-library(data.table)
-library(ggplot2)
-library(biomaRt)
-```
-```{r}
-ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
-tx2geneHomo = biomaRt::getBM(attributes=c('ensembl_transcript_id', 
-                                      'ensembl_gene_id', 'external_gene_name'),mart=ensembl)
-```
 
-```{r}
+
+
+```{Importation des datas d'alignement avec blast}
 blastHomo<-read.table("/ifb/data/mydatalocal/download/DataBats.blast")
 blastHomo<-data.table(blastHomo)
 head (blastHomo)
 ```
 
-```{r}
+```{add gene names to blast outputs}
 blastHomo<-blastHomo[, c("trid", "version") := tstrsplit(V2, ".", fixed=TRUE)][]
 blastHomo<-blastHomo[, c("gene", "alttr") := tstrsplit(V1, "_i", fixed=TRUE)][]
+head (blastHomo)
 blastHomo1 <- blastHomo%>% group_by(gene)%>% slice_max(order_by = V12, n = 1, with_ties = TRUE)
+head (blastHomo1)
 blastHomoName<-merge(tx2geneHomo,blastHomo1,by.x="ensembl_transcript_id",by.y="trid")
 blastHomoNameUniq<-unique(blastHomoName[,c("ensembl_gene_id","external_gene_name","gene")])
+```
+
+
+```{association of DE results (Cf DESeq2) and gene's human names}
 resUsName=merge(res,blastHomoNameUniq,by.x=0,by.y="gene")
 resUsName
 View(resUsName)
 write.csv(resUsName,file="/ifb/data/mydatalocal/outputs/count_blast_deseq")
 #pour télécharger le tableau de résultats
 
+```
+
+
+
+
+```{Classification de resUsName:our table}
 UpReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange>0)#pour séparer dans le tableau les 
 View(UpReg)
 write.csv(UpReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_up")
-UpReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange>0)
+
+ 
 DownReg <- filter(resUsName, padj<0.05 & resUsName$log2FoldChange<0)
 write.csv(DownReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_down")
+
 AllReg <- filter(resUsName, padj<0.05)
 AllReg
+write.csv(DownReg,file="/ifb/data/mydatalocal/outputs/count_blast_deseq_allreg")
+```
 
+
+```{Comparaison data Holzer}
 #article Holzer
 resBatHolzer<-read.csv("https://www.rna.uni-jena.de/supplements/mda/data/deseq2/RNA/Mock_6h_RNA_vs_IFN_6h_RNA/deseq2_Mock_6h_RNA_IFN_6h_RNA_full.csv")
 ```
 
 ```{r}
-write.csv(as.data.frame(resUsName$external_gene_name),file = "/ifb/data/mydatalocal")
-
-
-write.csv(as.data.frame(resUsName$external_gene_name), 
+write.csv(as.data.frame(unique(resUsName$external_gene_name)), 
           file="/ifb/data/mydatalocal/download/DE_align/genename_all.csv",quote=FALSE,row.names = FALSE)
-write.csv(as.data.frame(UpReg$external_gene_name), 
+
+write.csv(as.data.frame(unique(AllReg$external_gene_name)), 
+          file="/ifb/data/mydatalocal/download/DE_align/genename_allreg.csv",quote=FALSE,row.names = FALSE)
+
+
+write.csv(as.data.frame(unique(UpReg$external_gene_name)), 
           file="/ifb/data/mydatalocal/download/DE_align/genename_up.csv",quote=FALSE,row.names = FALSE)
-write.csv(as.data.frame(DownReg$external_gene_name), 
+ 
+          
+
+write.csv(as.data.frame(unique(DownReg$external_gene_name)), 
           file="/ifb/data/mydatalocal/download/DE_align/genename_down.csv",quote=FALSE,row.names = FALSE)
 
-colnames(resBatHolzer)[colnames(resBatHolzer)==gene_id]=ensembl_gene_id
-resBatHolzer
-Holzer_resUs<-merge(resBatHolzer,resUsName,by.x="gene_id",by.y="trid")
+##colnames(resBatHolzer)[colnames(resBatHolzer)==gene_id]=ensembl_gene_id: not the right column to change
+
+colnames(resBatHolzer)[2] <- c("external_gene_name")#change the column name to compare
+head(resBatHolzer)
+
+##Merge des gènes communs dans Holzer et Us
+Holzer_resUs<-merge(resBatHolzer,resUsName,by.x="external_gene_name",by.y="external_gene_name")
+
+##Construction d'une table avec les up reg dans Holzer et Us
+
+table(them=Holzer_resUs$padj.x<0.05,us=Holzer_resUs$padj.y < 0.05)
+#attention à l'ordre dans le merge pour déterminer le x et le y 
+
+chisq.test(table(them=Holzer_resUs$padj.x<0.05,us=Holzer_resUs$padj.y < 0.05))
+#chisq.test(table(us=CommonGenesUsHolze$ourTest,them=CommonGenesUsHolze$theirTest)
+#X-squared = 707.46, df = 1, p-value < 2.2e-16
+
+write.csv(table(them=Holzer_resUs$padj.x<0.05,us=Holzer_resUs$padj.y < 0.05)="/ifb/data/mydatalocal/outputs/holzer_us")
+table(resBatHolzer$padj <0.05)#gène de Holter avec DE, 1702 DE VS 12141 NS
+table(resBatHolzer$padj <0.05 & resBatHolzer$log2FoldChange>0)#sélectiongènesupreg
 ```
+
+```{r}
+table(resBatHolzer$padj <0.05 & resBatHolzer$log2FoldChange<0) #Number of genes significatively DOWNregulated 605 VS 16536
+
+```
+
+
+
+```{heatmap}
+select <- na.omit(resUsName$Row.names[resUsName$padj<0.05 & resUsName$log2FoldChange>0]) #sélection des gènes surexprimés
+select <-select[1:10]
+row.names(samples)=samples$run
+
+pheatmap(assay(vsd)[select,], cluster_rows=TRUE, show_rownames=TRUE,show_colnames=FALSE,
+         cluster_cols=FALSE, annotation_col=samples)
+         
+```
+
+
+
+
+
+
 
 ## R Markdown
 
