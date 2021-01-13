@@ -162,37 +162,70 @@ OnCe obtained gene expression levels, we could compare the transcription profile
 
 ![GitHub Logo](/images/dds_res.png){width=50%} 
 
+* Gene expression level analysis with DESeq2
 DESeq2 output provide for each gene a control condition normalized level of expression (BaseMean). The log2 foldchange informs on the ratio between the expression mean of both conditions. The p-value indicate the probability to observe a differential expression under H0 hypothesis (by chance). Consequently to gene-level summarization of transcripts expression, an adjustment of the p-value is necessary (padj). Indeed, assembled isoforms value could lead to repetition-induced statistical difference.  
 We looked at the genes for which the padj was lower than 0,1. 1745 genes on 295 779 were found with a significant differential expression (padj<0,1) under interferon treatment. 
 
-Analysing the 5 samples (libraries) 1896 genes on 287 553 analyzed were fund with a significantly different expression comparing control and interferon treatment 
+Analysing the 5 samples (libraries) 1896 genes on 287 553 analyzed were found with a significantly different expression comparing control and interferon treatment 
 
 
-*Graphic readout
+*Graphic readout of DE results
 
 We visualized genes with a log fold change ranging from -2 (downregulated) to 2 (upregulated) in function of the normalized mean expression with MA plot.
 This points that most of the genes with significant differential expression (in blue) are upregulated one.
 
+<img src="plotMA_ech6.png" alt="legend (plotMA)" width="50%"/>
 
-#Caractérisation des gènes présentant une expression différentielle en condition interféron
+To identify visually upregulated genes, we also displayed DESeq2 results n a heatmap format.   
 
-Association  des données d'alignement des transcripts de blast avec des noms correspondants de  gènes humains , par la commande merge
-Association des données d'expression différentielle de DESeq2 (res) aux noms d'homologues de gènes humains trouvés 
-Comparaison des gènes présentant une DE avec ceux de Holzer: study to annotate non coding RNA from bats (many non coding genes from bats are not annotated) . Lead in 16 bats genomes . Annotations compatible with NCBI and Ensembl (what does it mean ???)(CF yes annotations are availbale for bats!)Studied genes induced by IFN directly or IFN-inducing viruses, exclusively in Myotis or in both Myotis and Humans . Study led on M. daubentonii, 
-/!\ The used a kidney -cel line 
-Results Holzer : "When cells were treated for 6 h with IFN, 195 genes were strongly upregulated (i.e., substantially more than after
-6 h of Clone 13 infection). No gene was downregulated (Figures 3A and 3B). The IFN-regulated genes encompassed prototypical (OAS1, ISG15, Mx1, IFIT3, BST2, DHX58) but also less known ISGs (BCL2L14, RNF213, ESIP1)."
+<img src="heatmapUpReg.png" alt="legend (HeatMap)" width="50%"/>
 
-"predominant biological processes both at 6 and 24 h post infection
-encompassed antigen processing and presentation, antiviral defense, immune response, and NF-kB regulation (Figure S4B). Additionally, at 6 h there are indications of both up- and downregulation of intracellular
-and transmembrane transport, and at 24 h oxidoreductase activity is mostly downregulated.
-"Overall, running the two transcriptomes next to each
-other showed once more that at 6 h Clone 13 infection stimulated less genes (denominated as being ‘‘downregulated’’) than 6-h IFN treatment (Figures 4A and 4B). We could identify some genes that are upregulated
-exclusively by Clone 13, most prominently the prototypical, IRF3-driven virus-response gene IFNB1."
+* Analysis of DESeq2 dataset homogeneity
+
+We also built a two different principal component analysis (PCA) plot to compare differential gene expression between the 6 samples.
+As expected, the transcriptomic profiles of Lib4, 5 abd 6 corresponding to control samples well clustered. However, the Lib 3 sample importantly standed out the cluster of other IFN-treated samples. This indicates radically different RNA seq datas from this library that could be due to different RNA-seq quality (batch effect) or cell populations/conditions. In fact, RNA bank for the 3 rd sample was obtained in another session. Distinct environment parameters in these session could then have impact the transcription profile. 
+
+<img src="PCA_ech6.png" alt="legend (PCA)" width="50%"/>
+
+Repeating DE analysis, excluding divergent Lib 3 from the data set we obtained distinct results (ddsTxi_wo3). The number of differentially expresseg genes (padj<0,1) was higher, with 1896 genes on 289 449. The RNA seq data of control and interferon respectively well clustered in the PCA plot, indicating homogeneous profiles. 
+
+Nevertheless, considering the few number of replicates pe conditon (3), we chose to conserve the 3rd sample in downstream analysis, for better statistical power.
+
+* Human annotation of interferon responsive genes
+
+To  annotate the identified deferentially expressed genes, we used BiomaRt software. We associate identifiers from Ensembl to external human gene names (see **tx2geneHomo** table). We then merge it with blast alignments to get a table of differentially expressed transcripts, at a gene-level with human gene annotation (see **blastHomoNameUniq**).  
+
+<img src="resus_upreg.png" alt="legend (countblast_upreg)" width="50%"/>
+*Extract of upregulated genes' name (padj<O,O5) in interferon treated condition, and related data obtained with DESeq2*
+
+*Identification of interferon-modulated pathways
+
+To better characterize the transcriptomic response to interferon in Myotis Velifer, we performed a gene ontology analysis with Gorilla. 
+
+We entered DESeq2 results (see outputs/output_DE_align/ **count_blast_deseq_up** for instance) to visualize gene corresponding  biological pathways. 
+
+<img src="Go_ech6_upreg_process_def.png" alt="legend (Gene ontology_upreg)" width="50%"/> 
+
+Extract of biological processes in which IFN-upregulated genes (padj<0.05) are implied. Antigen presentation and defense response to virus appear especially upregulated. 
+
+* Results validity and current litterature
+
+To get an idea of our results' validity we compare them with a recent similarly- designed transcriptomic study by Holzer (see **https://www.sciencedirect.com/science/article/pii/S2589004219302949**).
+This study characterized the interferon response of  a kidney-cell line of M. daubentonii species. 
 
 
+We selected common genes to Holzer study and ours (see *Holzer_resUs*) and searched for a convergence of their transcriptomic profile  between both studies. Among common identified genes, 232 showed a differential expression in both. Chi2 analysis showed a statitical significance of convergent transcriptomic profiles between Holzer and our common genes. 
+Among common upregulated genes, we found typical ISGs such as SAMD9 (see the heatmap), IFI44, IFIH1 and others. Interisingly some well-known ISGs like OAS1, ISG15 were not observed in our study. Nevertheless, reciprocally, some found upregulated genes, like SP100 do not seem to be classified as ISGs. 
+
+#Conclusion and perspectives:
+
+Successive cleaning and quality controls,accurate quantification, coding selection and gene-level summation seem to provide reliable data t characterize IFN response in Myotis Velifer. However, increasing the sample number could homogenize data (see Lib 3 problematic) and improve statistical power. The lack of established genome, leading to de novo transcriptome assembly, decrease precision and reproducibility of the analysis. Moreover the alignement on human sequences to annotate identified upregulated genes conveys a loss of data of data. Some genes proper to Myotis Velifer or other microbats could have been missed and contribute to Myotis Velifer tolerance to viruses. Therefore it would be interesting to sequence Myotis Velifer genome to better characterize transcripts.Many genes, including non-coding ones remain to be annotated. Another partial solution would be to align Myotis Velifer transcripts on another better known microbat genome
+
+About the study's design, it could be also interesting to look for virus-responsive genes. Indeed, innate immune response against viral infection also passes through IFN-independent pathways.
+
+# Aknowledgments
+
+I would like to thank the sequencing platform team who made the RNA libraries and  Lucie Etienne who presened us their project.
+I am also grateful for the help of Corentin Dechaud, Romain Bulteau and especially Marie Cariou and Marie Semon. 
 
 
-## Ideas:
-
--Why not comparing woth other bats : annotations available
