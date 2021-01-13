@@ -196,34 +196,35 @@ Nevertheless, considering the few number of replicates pe conditon (3), we chose
 To  annotate the identified deferentially expressed genes, we used BiomaRt software. We associate identifiers from Ensembl to external human gene names (see **tx2geneHomo** table). We then merge it with blast alignments to get a table of differentially expressed transcripts, at a gene-level with human gene annotation (see **blastHomoNameUniq**).  
 
 <img src="resus_upreg.png" alt="legend (countblast_upreg)" width="50%"/>
-*Extract of upregulated genes' name (padj<O,O5) in interferon treated condition, and related data obtained with DESeq2*
+*Extract of upregulated genes' name (padj<O,O5) in interferon treated condition, and related data obtained with DESeq2*     
 
-*Identification of interferon-modulated pathways
 
-To better characterize the transcriptomic response to interferon in Myotis Velifer, we performed a gene ontology analysis with Gorilla. 
+* *Identification of interferon-modulated pathways*
+
+To better characterize the transcriptomic response to interferon in *Myotis Velifer*, we performed a gene ontology analysis with Gorilla. 
 
 We entered DESeq2 results (see outputs/output_DE_align/ **count_blast_deseq_up** for instance) to visualize gene corresponding  biological pathways. 
 
-<img src="Go_ech6_upreg_process_def.png" alt="legend (Gene ontology_upreg)" width="50%"/> 
+<img src="GO_ech6_upreg_process_def.png" alt="legend (Gene ontology_upreg)" width="50%"/> 
 
-Extract of biological processes in which IFN-upregulated genes (padj<0.05) are implied. Antigen presentation and defense response to virus appear especially upregulated. 
+*Extract of biological processes in which IFN-upregulated genes (padj<0.05) are implied. Antigen presentation and defense response to virus processes appear especially upregulated.* 
 
-* Results validity and current litterature
+* *Results validity and current literature*
 
-To get an idea of our results' validity we compare them with a recent similarly- designed transcriptomic study by Holzer (see **https://www.sciencedirect.com/science/article/pii/S2589004219302949**).
+To get an idea of our results'validity we compare them with a recent similarly- designed transcriptomic study by Holzer (see https://www.sciencedirect.com/science/article/pii/S2589004219302949).
 This study characterized the interferon response of  a kidney-cell line of M. daubentonii species. 
 
 
-We selected common genes to Holzer study and ours (see *Holzer_resUs*) and searched for a convergence of their transcriptomic profile  between both studies. Among common identified genes, 232 showed a differential expression in both. Chi2 analysis showed a statitical significance of convergent transcriptomic profiles between Holzer and our common genes. 
-Among common upregulated genes, we found typical ISGs such as SAMD9 (see the heatmap), IFI44, IFIH1 and others. Interisingly some well-known ISGs like OAS1, ISG15 were not observed in our study. Nevertheless, reciprocally, some found upregulated genes, like SP100 do not seem to be classified as ISGs. 
+We selected common genes to Holzer study and ours (see **Holzer_resUs**) and searched for a convergence of their transcriptomic profile. Among common identified genes, 232 showed a differential expression in bothstudies. Chi2 analysis showed a statitical significance of convergent transcriptomic profiles between Holzer and our common genes. 
+Among common upregulated genes, we found typical ISGs such as SAMD9 (see the **heatmap**), IFI44, IFIH1 and others. Interestingly some well-known ISGs like OAS1, ISG15 were not observed in our study. Nevertheless, reciprocally, some found upregulated genes, like SP100 do not seem to be classified as ISGs. 
 
-#Conclusion and perspectives:
+## Conclusion and perspectives:
 
-Successive cleaning and quality controls,accurate quantification, coding selection and gene-level summation seem to provide reliable data t characterize IFN response in Myotis Velifer. However, increasing the sample number could homogenize data (see Lib 3 problematic) and improve statistical power. The lack of established genome, leading to de novo transcriptome assembly, decrease precision and reproducibility of the analysis. Moreover the alignement on human sequences to annotate identified upregulated genes conveys a loss of data of data. Some genes proper to Myotis Velifer or other microbats could have been missed and contribute to Myotis Velifer tolerance to viruses. Therefore it would be interesting to sequence Myotis Velifer genome to better characterize transcripts.Many genes, including non-coding ones remain to be annotated. Another partial solution would be to align Myotis Velifer transcripts on another better known microbat genome
+Successive cleaning and quality controls,accurate quantification, coding selection and gene-level summation seem to provide reliable data t characterize IFN response in *Myotis Velifer*. However, increasing the sample number could homogenize data (see Lib 3 problematic) and improve statistical power. The lack of established genome, leading to de novo transcriptome assembly, decrease precision and reproducibility of the analysis. Moreover the alignement on human sequences to annotate identified upregulated genes conveys a loss of data of data. Some genes proper to Myotis Velifer or other microbats could have been missed and contribute to Myotis Velifer tolerance to viruses. Therefore it would be interesting to sequence Myotis Velifer genome to better characterize transcripts. Many genes, including non-coding ones remain to be annotated. Another partial solution would be to align *Myotis Velifer* transcripts on another better known microbat genomes.
 
 About the study's design, it could be also interesting to look for virus-responsive genes. Indeed, innate immune response against viral infection also passes through IFN-independent pathways.
 
-# Aknowledgments
+## Aknowledgments
 
 I would like to thank the sequencing platform team who made the RNA libraries and  Lucie Etienne who presened us their project.
 I am also grateful for the help of Corentin Dechaud, Romain Bulteau and especially Marie Cariou and Marie Semon. 
