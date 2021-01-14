@@ -13,7 +13,7 @@ output:
 Bats are frequently exposed to  a large spectrum of viruses but seem asymptomatic. Specific bats immune responses would have developed with a long-term cohabitation with viruses to reach an equilibrium between viral resistance and tolerance. This high tolerance to viruses is thought to be due to a particularly performing antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Interferon Stimulated Genes (ISG). Some ISGs protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
 Here we aimed at identifying genes stimulated by the interferon response in *Myotis velifer* species of microbat. We performed analysis of transcriptomic data collected by L.Etienne's research team. This implied first trimming and quality assessment steps. Secondly came transcriptome assembly and annotation steps as *Myotis Velifer* genome is unknown. In parallel trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with homologous known human ISGs.  
 
-<img src="images/workflow_tp.png" alt="legend (paired end sequencing)" width="70%"/>
+<img src="images/workflow_tp.png" alt="legend (paired end sequencing)" width="80%"/>
 
 
 ## Obtention of biological data
@@ -33,12 +33,12 @@ We first assessed the quality of reads' sequencing to determine if sequencing da
 Fastqc report presents quality analysis at different sequencing levels (see mydatalocal/output_fastqc). The "Per base sequence quality" analysis shows a drop in sequencing quality for final bases. Decreased sequencing quality with increased read length is due to technical defects. Indeed, in the Illumina technique, among clusters of identical DNA molecule, sequencing of some DNA reads will desynchronize over runs. Consequently, probe signal for nucleotide identification will be less pure, increasing sequencing errors in last runs.
 
 
-<img src="images/perbasequality_lib1.png." alt="legend (perbasequality)" width="70%"/>
+<img src="images/perbasequality_lib1.png" alt="legend (perbasequality)" width="60%"/>
 *Bases' quality score in function of base position in the read, quality report for the Lib1 reads library*
 
 The "Per sequence quality scores" indicates a good overall quality score in the great majority of reads in the different libraries. However the per sequence GC contents scores suggests unreliable read quality. In some libraries, the G proportion is significantly higher whereas we would expect similar proportions of A and T, and G and C, and consequently linear curves. This could be due to a biased sequencing. 
 
-<img src="images/perbaseseqcontent.png" alt="legend (perbaseseqcontent)" width="70%"/>
+<img src="images/perbaseseqcontent.png" alt="legend (perbaseseqcontent)" width="60%"/>
 *Graphic representation of the per base sequence content from the fastqc report of R1 reads, from library 1*
 
 
@@ -62,7 +62,7 @@ For more information on Trinity commands (memory and CPU), see **Trinity.sh** sc
 
 Trinity distinguishes transcripts isoforms (Trinity.fasta) and associate them to the corresponding gene (Trinity.fasta.gene_tras_map). In the assembled transcriptome outputs  processed reads are associated to a cluster (DN []_C[]), a gene (g[]) and an isoform (i []). 400 000 distinct transcripts were identified by Trinity and 311 364 genes (excluding isoform distinctions). These results are abnormally high if we compare with the 20 000 genes of human genome. This could be due to the inclusion of excessively short reads for genome assembly.
 
-<img src="images/trinity_outputs_bis.png" alt="legend (trinity_outputs)" width="70%"/>
+<img src="images/trinity_outputs_bis.png" alt="legend (trinity_outputs)" width="80%"/>
 
 *Extract of trinity outputs from Trinity.fasta file. Each transcript is signaled by a chevron.*
 
@@ -74,7 +74,7 @@ To identify coding regions within trinity transcripts sequences we used TransDec
 Then, coding regions (CDS) candidates were detected by Transdecoder.Predict. We filtered regions with best coding likelihood, that appear in outputs/trandec_data/**trinity.fasta.transdecoder.cds** file. In this file are reported nucleotidic sequences of the selected coding sequences.
 
 
-<img src="images/transdecoder.png" alt="legend (transdecoder)" width="80%"/>
+<img src="images/transdecoder.png" alt="legend (transdecoder)" width="90%"/>
 
 *Scheme of transdecoder inputs and outputs forms*
 
@@ -124,7 +124,7 @@ Once obtained gene expression levels, we could compare transcription profiles be
 
 DESeq2 outputs provide for each gene a control condition normalized level of expression (BaseMean). The log2 foldchange informs on the ratio between the expression mean of both conditions. The p-value indicate the probability to observe a differential expression under H0 hypothesis (by chance). Consequently to gene-level summarization of transcripts expression, an adjustment of the p-value is necessary (padj). Indeed, assembled isoforms value could lead to a repetition-induced statistical difference.  
 
-<img src="images/dds_res.png" alt="legend (gene_DE_DESeq)" width="80%"/> 
+<img src="images/dds_res_bis.png" alt="legend (gene_DE_DESeq)" width="80%"/> 
 
 We looked at the genes for which the padj was lower than 0,1. 1745 genes on 295 779 were found with a significant differential expression (padj<0,1) under interferon treatment. 
 
@@ -134,11 +134,13 @@ We looked at the genes for which the padj was lower than 0,1. 1745 genes on 295 
 We visualized genes with a log fold change ranging from -2 (downregulated) to 2 (upregulated) in function of the normalized mean expression with MA plot. It points that most of the genes with significant differential expression (in blue) are upregulated ones.
 
 <img src="images/plotMA_ech6.png" alt="legend (plotMA)" width="60%"/>
+
 *MA plot obtained with DESeq2 results on the 6 samples.*
 
 To identify visually upregulated genes, we also displayed DESeq2 results in a heatmap format.   
 
 <img src="images/heatmapUpReg.png" alt="legend (HeatMap)" width="50%"/>
+
 *Heatmap of the first ten upregulated genes (padj<0.05)*
 
 * **Analysis of DESeq2 dataset homogeneity**
@@ -147,9 +149,9 @@ We also built a two different principal component analysis (PCA) plot to compare
 As expected, the transcriptomic profiles of Lib4, 5 and 6, corresponding to control samples, well cluster. However, the Lib 3 sample significantly stand out the cluster of other IFN-treated samples. This indicates radically different RNA seq data from this library that could be due to different RNA-seq quality (batch effect) or cell populations/culture conditions. In fact, RNA bank for the 3<sup> rd</sup> sample was obtained in another session. Distinct environment parameters in these session could then have impact transcription profiles. 
 
 <img src="images/PCA_ech6.png" alt="legend (PCA)" 
-width="70%"/>
+width="50%"/>
 
-*PCA plot obtained with DESeq2 results on the 6 samples*
+*PCA plot obtained with DESeq2 results on the 6 samples.*
 
 Repeating DE analysis, excluding divergent Lib 3 of the dataset, we obtained distinct results (see **ddsTxi_wo3**). The number of differentially expressed genes (padj<0,1) was higher, with 1896 genes on 289 449. The RNA seq data of control and interferon respectively well clustered in the PCA plot, indicating homogeneous profiles. 
 
@@ -160,7 +162,7 @@ Nevertheless, considering the few number of replicates per conditon (3), we chos
 To annotate the identified differentially expressed genes, we used BiomaRt software. We associated identifiers from Ensembl to external human gene names (see **tx2geneHomo** table). We then merged it with blast alignments to get a table of differentially expressed transcripts, at a gene-level with human gene annotation (see **blastHomoNameUniq**).  
 
 <img src="images/resus_upreg_bis.png" alt="legend (countblast_upreg)"
-width="70%"/>
+width="90%"/>
 
 *Extract of upregulated genes' name (padj<0.05) in interferon-treated condition, and related data obtained with DESeq2.*
 
@@ -171,6 +173,7 @@ To better characterize the transcriptomic response to interferon in *Myotis Veli
 We entered DESeq2 results (see outputs/output_DE_align/ **count_blast_deseq_up** for instance) to visualize the biological pathways corresponding to the regulated genes. 
 
 <img src="images/GO_ech6_upreg_process_def.png" alt="legend (Gene ontology_upreg)" width="50%"/> 
+
 *Extract of biological processes in which IFN-upregulated genes (padj<0.05) are implied. Antigen presentation and defense response to virus processes appear especially upregulated.* 
 
 * **Results' validity and current literature**
