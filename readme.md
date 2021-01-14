@@ -5,21 +5,18 @@ output:
   pdf_document: default
 ---
 
-# Characterization of the Interferon transcriptomic response  in a microbat species
+# Characterization of the interferon response in a microbat species
 
 
 ## Introduction
 
-Bats are frequently exposed to  a large spectrum of viruses but seem asymptomaric. This suggest specific bat's immunity responses developed through a long -term cohabitation with viruses. Bat's immunity would have reached an equilibrium between viral resistance and tolerance. High tolerance to viruses is thought to be due to a particularly performant antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Insterferon Stimulated Genes (ISG). Some ISG protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
-Here we aimed at identifying genes stimulated by the interferon response in Myotis velifer specie of microbat. Analyses were performed on transcriptomic data collected by L.E's scientific team. Analyses first consisted in transcriptome assembly and annotation steps. Then trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with known human corresponding ISGs.  
+Bats are frequently exposed to  a large spectrum of viruses but seem asymptomatic. Specific bats immune responses would have developed with a long-term cohabitation with viruses to reach an equilibrium between viral resistance and tolerance. This high tolerance to viruses is thought to be due to a particularly performing antiviral interferon (IFN) response. Indeed, among innate immune responses to viral agents, interferon synthesis activate the expression of hundred of genes: Interferon Stimulated Genes (ISG). Some ISGs protect from viral infection impairing viral replication steps. The IFN system has been largely studied in megabats but fewer studies have been done in microbats.  
+Here we aimed at identifying genes stimulated by the interferon response in *Myotis velifer* species of microbat. We performed analysis of transcriptomic data collected by L.Etienne's scientific team. This implied first trimming and quality assessment steps. Secondly came transcriptome assembly and annotation steps as *Myotis Velifer* genome is unknown. In parallel trancripts level under interferon stimulation or not were estimated through reads quantification. Finally associated  genes were identified comparing with homologous known human ISGs.  
 
-<img src="images/workflow_tp.png" alt="legend (paired end sequencing)" width="50%"/>
-
-Problème: Pas de datas de transcriptomique pour l'espèce Myotis velifer disponibles dans les bases de données
-Moyen: Production et analyse de données transcriptomique pour caractériser  le profil d'expression des gènes en réponse interféron de Myotis velifer
+<img src="images/workflow_tp.png" alt="legend (paired end sequencing)" width="70%"/>
 
 
-## Obtention of biological datas
+## Obtention of biological data
 
 Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
 
