@@ -18,102 +18,104 @@ Here we aimed at identifying genes stimulated by the interferon response in *Myo
 
 ## Obtention of biological data
 
-Analyzed RNA-seq datas derives  from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts had been incubated with interferon for 6hours (IFN samples) or not, for control (CTL )samples. mRNA seq libraries  were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with a  adaptaters pairs, forming reads (read 1 and read 2 corresponding to each of DNA strand) .Quality control was performed to assess DNA concentration before sequencing DNA reads  through Ilumina Seq technique. Read 1 and read 2 constructs enabled Paired-end sequencing.  DNA reads were sequenced from both ends for high- quality sequencing.   Biological and associated quality sequencing datas and associated quality evaluation were combined in fastq files that are the feeding  datas of our analyses.
+Analyzed RNA-seq data derive from 6 samples of Myotis velifer's fibroblasts cultures.  Cultured fibroblasts have been incubated with interferon for 6 hours (IFN samples) or with medium only, for control (CTL)samples. mRNA seq libraries were obtained through reverse transcription of transcripts into double-stranded complementary DNA. To amplify libraries, PCR was performed on those cDNA fragments fused with adapters pairs. Quality control was performed to assess DNA concentration before sequencing DNA reads with Illumina Seq technique. Sequencing was performed in paired-end: each DNA fragments was sequenced from both ends. This generated two reads (forward and reverse) of approximately 150pb, corresponding to each of the strand, delimiting an unknown sequence ("inner distance" on the scheme).
+Paired-end sequencing is longer and more expensive  but it better detects DNA rearrangements and repetitions providing high quality sequencing. Subsequently read pairs improve alignment accuracy through longer contigs for the *de novo* assembly step. Biological and associated sequencing-quality  data were combined in fastq files:the raw data of downstream analyses.
 
 
 
-<img src="images/paired-end-read-1.png" alt="legend (paired end sequencing)" width="50%"/>
+<img src="images/paired-end-read-1.png" alt="legend (paired end sequencing)" width="60%"/>
 
-*from thesequencingcenter.com*
-
-## Téléchargement des données de RNA-seq 
-Reading: single-end ou paired-end?
-RNA-seq en single-end: lit le fragment d'ARN d'un bout à l'autre,
-RNA-seq en paired-end:"sorte d'aller -retour" 2 reads, un sur chacun des brins, orientés dans des sens opposés
-RNA seq en paired-end est plus cher et plus long mais meilleure capacité à identifier la position relative des fragments dans le génome: meilleure gestion des réarrangements de séquence (insertion, délétion,inversion)
-Historiquement, single end arrivé en premier puis paired end, aujourd'hui le séquençage RNA standard utilisé. 
-Ici, pour chaque échantillon, on a bien un Read 1 et un Read 2, chacun d'environ 150pb (assez court). Théoriquement les 2 reads ne sont pas censés se chevaucher mais c'est arrivé
-/!\ On n'a pas la séquence entre les reads
-
-We first assessed the quality of reads' sequencing to determine if sequencing datas were reliable for transcriptome assembly. 
-
-## Assessment of RNA-seq datas' quality: Fastqc 
-
-To determine reads'quality we ran the fastqc program on each type of reads (forward and reverse) in all samples. 
--Cf:Testdequalite file-
-Fastqc report present quality analysis at  different sequencing level.
--Cf html files in outputs/output_fastqc-
-"Per base sequence quality" shows a drop in sequencing quality for final bases.Decreasing sequencing quality with increasing read length is due to tecnical defects. Indeed, in the Ilumina platform, among clusters of identical DNA molecule, sequencing of some DNA reads will desynchronize over runs. Consequently, probe signal for nucleotide identification will be less pure, increasing sequencing errors in last runs. 
-![GitHub Logo](/images/perbasequality_lib1.png){width=30%} 
--Bases quality score in function of base position in the read, quality report for Lib1 library reads-
-
-The "Per sequence quality scores" indicated a good overall quality score in the great majority of reads in the different libraries. However the per sequence GC contents scores suggested unreliable read quality. In some libraries, the G proportion was sigificantly higher whereas we would expect similar proportions of A and T, and G and C, and consequently linear curves. This could be due to a biaised sequencing. 
-![GitHub Logo](/images/perbaseseqcontent.png){width=20%} 
--Graphical representation of the per base sequence content from the fastqc report of R1 reads, library 1-
-"Per tile sequence quality" Distribution de la qualité moyenne pour chaque séquence
+*Scheme of paired-end sequencing, picture from thesequencingcenter.com*
 
 
-Considering the relative quality of RNA-seq datas, especially the dropping at sequences'end, we cleaned the datas. Indeed, a low row datas quality could biased following analysis.; 
---> Qualité moyenne des donées de RNA-seq, nécessité d'un nettoyage pour ségréger les read appariés et non appariés 
+## Assessment of RNA-seq data quality: Fastqc 
 
-## Cleaning of RNA-seq datas: Trimommatic 
-
-Before genome assembly we cleaned datas with Trimommatic.
-Note that cleaning step can also be treated with genome assembly combining program running. To treat paired reads, we ran Trimmomatic in a paired-end (PE) mode distinguishing froward and reverse read files as inputs.Nucleotides with a quality score or phred score threhold of 33 were filtered. In others words, bases with an incorrect probability call superior to 10^E -3 were eliminated. Short reads with a length below 100 bases were removed with MINLEN software, and the first 9 bases of each reads were suppressed (HEADCROP). Adaptators and illumina related sequences were also suppressed of reads (ILLUMINACLIP) Indeed adaptaters can be sequenced when if they dimerize or if they are readen as the prolongement of short DNA fragments by the sequencer. We could have removed starting or ending bases of reads, below a defined quality threshold with leading and trailing.  
-Paired and unpaired  reads resulting from Trimmomatic cleaning were  distinguished  in dedicated output files, for each forward and reverse reads 
-Reads quality was performed again with fastqc to assess trimming efficiency. 
-
-A second quality testing of RNA datas was made to assess the cleaning.
+We first assessed the quality of reads' sequencing to determine if sequencing data were reliable enough for transcriptome assembly. To determine reads' quality we ran the fastqc program on each type of reads (forward and reverse) in all samples (see **Testdequalite.sh**). 
+Fastqc report presents quality analysis at different sequencing levels (see mydatalocal/output_fastqc). The "Per base sequence quality" analysis shows a drop in sequencing quality for final bases. Decreased sequencing quality with increased read length is due to technical defects. Indeed, in the Illumina technique, among clusters of identical DNA molecule, sequencing of some DNA reads will desynchronize over runs. Consequently, probe signal for nucleotide identification will be less pure, increasing sequencing errors in last runs.
 
 
+<img src="images/perbasequality_lib1.png.png" alt="legend (perbasequality)" width="20%"/>
+-Bases' quality score in function of base position in the read, quality report for the Lib1 reads library -
 
-## Transcriptome assembly with Trinity
-Since no genome is available for Myotis Velifer, we performed de novo genome assembly using transcriptomic datas from both interferon and control conditions.In line with a paired-end analysis, for all six libraries only paired reads outputs of Timommatic were used. Trinity assembles the transcriptome using a Debreui Graph strategy. Transcripts with similar sequences are grouped in clusters that roughly correspond to a gene. Each clusters are treated separately to finally reconstruct the genome.  
+The "Per sequence quality scores" indicates a good overall quality score in the great majority of reads in the different libraries. However the per sequence GC contents scores suggests unreliable read quality. In some libraries, the G proportion is significantly higher whereas we would expect similar proportions of A and T, and G and C, and consequently linear curves. This could be due to a biased sequencing. 
 
-To run Trinity, we indicated the fastqc format of the input files (--seqType) and precised left reads (R1_paired) and rights reads (R2_paired)files so that Trinity could process both reads types' informations separately.
-We also mentioned reads position and orientation on  fragments strains (SS--lib--type) for correct lecture of the reads. In this study, sequencing was performed in "firstrand " (fr) or rf in Trinity. 
-For more information on Trinity commands (memory and CPU), see Trinity.sh script
+<img src="images/perbaseseqcontent.png" alt="legend (perbaseseqcontent)" width="20%"/>
+-Graphic representation of the per base sequence content from the fastqc report of R1 reads, from library 1-
 
-Trinity distinguishes transcripts isoforms (Trinity.fasta) and associate them to the corresponding gene (Trinity.fasta.gene_tras_map). In the assembled transcriptome outputs  processed reads are associated to a cluster (DN []_C[]), a gene (g[]) and an isoform (i []). 400 000 distinct transcripts were identified by Trinity and 311 364 genes (excluding  isoforms distinctions). These results are abnormally high if we compare with the 20 000 genes of human genome. This could be due to the inclusion of excessively short read for genome assembly.
 
-Once the transcriptom assembled, next step was to annotate it to identify transcripts' functions. Indeed, our final goal was to characterize gene differential expresion in antiviral responses in yotis Velufer.
+Considering the relative quality of RNA-seq data, especially the dropping at the sequences'end, we cleaned the data. Indeed, a low raw data quality could biased downstream analysis.
 
-#Transcriptome annotation
 
-To identify coding regions within trinity transcripts sequences we used TransDecoder. ORFs were first identified running Transdecoder.Longorfs on assembled transcriptome (Trinity.fasta) with the gene correspondance (Trinity.fasta.gene_trans_map.). We retained only transcripts sequences encoding for proteins of at least 100 amino acidslong, with the m-parameter, see Transdecoder.sh
-Then, coding regions (CDS) candidates were detected by Transdecoder.Predict. We filtered regions with best coding , that appear in trinity.fasta.transdecoder.cds file. In this This final output are reported nucleotide sequences of the selected coding sequences.
-To infer the biological function of  these CDS we searched for sequence homologies with human CDS. Indeed, human CDS are better annotate than the genome of bats species  phylogenetically closer to Myotis velifer. 
-Homologies between Myotis Velifer identified CDS and Human CDS were searched with Blast. 
-Blast running requires to build a database listing human CDS. Those were downloaded from Ensembl online database with wget command. Then makeblastdb application enabled to organize those CDS in a database assigning an unique identifier to every sequence. Nucleotidic nature of the sequences and fasta format of downloaded CDS were indicated respectively with dbtype 'nucl'and -parse_seqids parameters.
+## Cleaning of RNA-seq data : Trimmomatic 
 
-To  find sequences homologies, we align Myotis velifer selected CDS on human CDS database with the blastn program. Indeed both sequences in blast database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. We chose to only select one hit result for every asembled contig (-max_target_seqs parameter) and limited blast e-value of 10<sup>-4</sup>, meaning that the probability this hit occured by chance would be one on 10 000. The first 6 aligned CDS were visualized with -outfmt parameter. 
- -faire code transdecoder + blast
+Before genome assembly we cleaned data with Trimmomatic (see **NettoyageTrimomatic**).
+Note that the cleaning step can also be treated with genome assembly combining program runs. To treat paired reads, we ran Trimmomatic in a paired-end (PE) mode distinguishing forward and reverse read files in input. Nucleotides with a quality score (or phred score) threshold of 33 were filtered. In others words, bases with a correct call probability below  1.10 <sup>-3</sup> were removed. Short reads with a length below 100 bases were also removed with MINLEN software, and the first 9 bases of each reads were suppressed (HEADCROP). Adapters and Illumina-related sequences were also suppressed of the reads (ILLUMINACLIP). Indeed adapters can be sequenced when if they dimerize or if they are read as the extension of short DNA fragments by the sequencer. We could have removed starting or ending bases of reads, below a defined quality threshold with leading and trailing functions.  
+Paired and unpaired reads resulting from Trimmomatic cleaning were  distinguished in dedicated output files, for each forward and reverse reads 
+Reads quality was assessed again with fastqc to check trimming efficiency. 
+
+
+## De novo transcriptome assembly : Trinity
+Since no genome is available for *Myotis Velifer*, we performed de *novo* genome assembly with Trinity using transcriptomic data from both interferon and control conditions. In line with the paired-end analysis, for all six libraries only paired reads outputs of Trimmomatic were used. Trinity assembles the transcriptome using a Debreuil Graph strategy. Transcripts with similar sequences are grouped in clusters that roughly correspond to a gene. Each cluster is treated separately to finally reconstruct the genome.  
+
+To run Trinity, we indicated the fastqc format of the input files (--seqType) and precised left reads (R1_paired) and rights reads (R2_paired) files so that Trinity could process both reads' types information separately.
+We also mentioned reads position and orientation on fragments' strains (SS--lib--type) for correct lecture of the reads. In this study, sequencing was performed in "firstrand " (fr) or rf in Trinity. 
+For more information on Trinity commands (memory and CPU), see **Trinity.sh** script.
+
+Trinity distinguishes transcripts isoforms (Trinity.fasta) and associate them to the corresponding gene (Trinity.fasta.gene_tras_map). In the assembled transcriptome outputs  processed reads are associated to a cluster (DN []_C[]), a gene (g[]) and an isoform (i []). 400 000 distinct transcripts were identified by Trinity and 311 364 genes (excluding isoform distinctions). These results are abnormally high if we compare with the 20 000 genes of human genome. This could be due to the inclusion of excessively short reads for genome assembly.
+
+<img src="images/trinity_outputs.png" alt="legend (trinity_outputs)" width="70%"/>
+*Extract of trinity outputs from Trinity.fasta file*
+
+
+Once the transcriptome assembled, next step was to annotate it to identify transcripts' functions. Indeed, our final goal was to characterize genes differential expression in antiviral responses of *Myotis Velifer*.
+
+##Transcriptome annotation : Transdecoder and Blastn
+
+To identify coding regions within trinity transcripts sequences we used TransDecoder. ORFs were first identified running Transdecoder.Longorfs on assembled transcriptome (Trinity.fasta) and providing gene correspondence (Trinity.fasta.gene_trans_map.). We retained only transcripts sequences coding for proteins of at least 100 amino acids long, with the m-parameter (see **transdecoder.sh**).
+Then, coding regions (CDS) candidates were detected by Transdecoder.Predict. We filtered regions with best coding likelihood, that appear in outputs/trandec_data/**trinity.fasta.transdecoder.cds** file. In this file are reported nucleotidic sequences of the selected coding sequences.
+
+<img src="images/transdecoder.png" alt="legend (transdecoder)" width="60%"/>
+*Scheme of transdecoder inputs and outputs forms*
+
+
+To infer the biological functions of these CDS we searched for sequence homologies with human CDS. Indeed, human CDS are better annotate than the genome of bats species  phylogenetically closer to *Myotis velifer*. 
+Homologies between *Myotis Velifer*'s identified CDS and Human CDS were searched with Blast (see **humCDS_Blast.sh**). 
+Blast running requires to build a database listing human CDS. Those were downloaded from Ensembl online database with the wget command. Then makeblastdb application enabled to organize those CDS in a database assigning an unique identifier to every sequence. Nucleotidic nature of the sequences and fasta format of downloaded CDS were indicated respectively with dbtype 'nucl'and -parse_seqids parameters.
+
+To  find sequences homologies, we align *Myotis velifer* selected CDS on human CDS database with the blastn program. Indeed both sequences in blast database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. We chose to only select one hit result for every assembled contig (-max_target_seqs parameter) and limited blast e-value of 10<sup>-4</sup>, meaning that the probability this hit would occur by chance would be one on 10 000. The first 6 aligned CDS were visualized with -outfmt parameter. 
+
+<img src="images/blastdb.png" alt="legend (blastdb)" width="60%"/>
+*Table of the first six Myotis velifer coding sequences aligned with human ones*
+
 In parallel with the annotation of the assembled transcriptome another step was to quantify transcripts expression.
 
-## Transcripts quantification
+## Transcripts quantification : Salmon
 
 
-To determine transcripts levels in control and interferon conditions,we used Salmon software. It aligns reads on corresponding transcripts for quantification.  
+To determine transcripts levels in control and interferon conditions, we used Salmon software. It aligns reads on corresponding transcripts for quantification.  
 
 
-*Building of an index for Salmon quasi-mapping
+* **Building of an index for Salmon quasi-mapping**
 
-Salmon quantification requires an index listing  fragments of a fixed length k (k-mères) that could sequence each given transcript. Indeed, Salmon does not perform a per base alignment but rather detect matches with transcripts sequences for quantification.  We thus establish salmon index with trinity outputs keeping the default value k=31 for listed k-mères. 
+Salmon quantification requires an index listing fragments of a fixed length k (k-mères) that could sequence each given transcript. Indeed, Salmon does not perform a per base alignment but rather detect matches with transcripts sequences for quantification. We thus established a salmon index with trinity outputs keeping the default value k=31 for listed k-mères (see **salmon.sh** script). 
 
 
-*Salmon quantification
+* **Salmon quantification**
 
-For analysis reliability, we quantified only the paired reads, previously trimmed with Trimmomatic. We also implement Salmon quantification accuracy through the GC bias inclusion (--gcBias command) and a more selective mapping algorithm for alignement (--validateMappings command).
-Among quant outputs, we focused on the transcripts per million (TPM)results. It corresponds to an fine estimation of transcripts quantities through gene length   and deepthness sequencing normalization of row counts. 
+For analysis reliability, we quantified only the paired reads, previously trimmed with Trimmomatic. We also implemented Salmon quantification accuracy through the GC bias inclusion (--gcBias command) and a more selective mapping algorithm for alignment (--validateMappings command).
+Among quant outputs, we focused on the transcripts per million (TPM)results. It corresponds to an fine estimation of transcripts quantities through a gene length and deepthness sequencing normalization of raw counts. 
+
+<img src="images/blastdb.png" alt="legend (blastdb)" width="60%"/>
+
 
 Surprisingly, on average only  40% of reads were aligned by Salmon (mapping rate result), which suggests an important loss of data and a possible underestimated quantification. Indeed, Salmon excludes reads with insufficient alignment and imperfect final sequence matches. 
 
 ![GitHub Logo](/images/head-quantoutputs_lib1.png|width=30%)
 
-*Extract of salmon quantification outputs for paired reads of the first library (CTL). 
+*Extract of salmon quantification outputs for paired reads of the first library (CTL).* 
 
 
-As shown above, Salmon provide probabilistic values of 
+As shown above, Salmon provide probabilistic values of the effective length (a length value that include gc-bias, fraglent length distribution )
 
 quantification is isoform specific. To determine gene- level  expression  we used the tximport package that sums same-gene-derived transcripts informations. To this purpose we create a dataframe (tx2gene=trini1) based on  Trinity gene transmap associating transcripts ID to gene IDs.
 Thus Tximport summed the Salmon transcripts level datas for each corresponding gene. Tximport outputs are thus provide probabilistic values of gene length and corresponding reads' count and  abundance.  
