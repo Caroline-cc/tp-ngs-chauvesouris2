@@ -85,7 +85,7 @@ Before running blast, we had to build a reference database listing human CDS for
 
 To  find sequence homologies, we align *Myotis velifer* selected CDS on human CDS database with blastn program. Indeed both sequences in blast database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. We chose to only select one hit result for every assembled contig (-max_target_seqs parameter) and limited blast e-value to 10<sup>-4</sup>, meaning that there would be less than one chance on 10 000 that a found alignment would occur just by chance. The first 6 aligned CDS were visualized with -outfmt parameter. 
 
-<img src="images/blastdb.png" alt="legend (blastdb)" width="80%"/>
+<img src="images/blastdb.png" alt="legend (blastdb)" width="90%"/>
 
 *Table of the first six Myotis velifer coding sequences aligned with human ones*
 
@@ -139,7 +139,7 @@ We visualized genes with a log fold change ranging from -2 (downregulated) to 2 
 
 To identify visually upregulated genes, we also displayed DESeq2 results in a heatmap format.   
 
-<img src="images/heatmapUpReg.png" alt="legend (HeatMap)" width="50%"/>
+<img src="images/heatmapUpReg.png" alt="legend (HeatMap)" width="70%"/>
 
 *Heatmap of the first ten upregulated genes (padj<0.05)*
 
@@ -149,7 +149,7 @@ We also built a two different principal component analysis (PCA) plot to compare
 As expected, the transcriptomic profiles of Lib4, 5 and 6, corresponding to control samples, well cluster. However, the Lib 3 sample significantly stand out the cluster of other IFN-treated samples. This indicates radically different RNA seq data from this library that could be due to different RNA-seq quality (batch effect) or cell populations/culture conditions. In fact, RNA bank for the 3<sup> rd</sup> sample was obtained in another session. Distinct environment parameters in these session could then have impact transcription profiles. 
 
 <img src="images/PCA_ech6.png" alt="legend (PCA)" 
-width="50%"/>
+width="70%"/>
 
 *PCA plot obtained with DESeq2 results on the 6 samples.*
 
