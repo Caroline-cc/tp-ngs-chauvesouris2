@@ -85,7 +85,7 @@ Before running blast, we had to build a reference database listing human CDS for
 
 To  find sequence homologies, we align *Myotis velifer* selected CDS on human CDS database with blastn program. Indeed both sequences in blast database (subjects sequences) and Transdecoder CDS outputs (query sequences) are nucleotidic. We chose to only select one hit result for every assembled contig (-max_target_seqs parameter) and limited blast e-value to 10<sup>-4</sup>, meaning that there would be less than one chance on 10 000 that a found alignment would occur just by chance. The first 6 aligned CDS were visualized with -outfmt parameter. 
 
-<img src="images/blastdb.png" alt="legend (blastdb)" width="90%"/>
+<img src="images/blastdb.png" alt="legend (blastdb)" width="100%"/>
 
 *Table of the first six Myotis velifer coding sequences aligned with human ones*
 
